@@ -95,7 +95,6 @@ components:
           type: object
         tidsstempel:
           type: string
-          format: date-time
 
     Aktivitetslogg:
       type: object
