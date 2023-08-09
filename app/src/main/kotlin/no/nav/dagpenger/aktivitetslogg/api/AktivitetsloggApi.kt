@@ -1,6 +1,5 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application

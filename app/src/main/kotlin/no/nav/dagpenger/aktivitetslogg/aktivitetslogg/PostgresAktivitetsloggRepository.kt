@@ -25,7 +25,7 @@ internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : Ak
         session.run(
             queryOf(
                 //language=PostgreSQL
-                statement = """INSERT INTO aktivitetslogg (id, ident, json) VALUES (:uuid, :ident, :json::jsonb)""",
+                statement = """INSERT INTO aktivitetslogg (melding_id, ident, json) VALUES (:uuid, :ident, :json::jsonb)""",
                 paramMap = mapOf(
                     "uuid" to uuid,
                     "ident" to ident,
