@@ -3,6 +3,7 @@ package no.nav.dagpenger.aktivitetslogg
 import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.aktivitetsloggApi
+import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.clean
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.aktivitetslogg.mottak.AktivitetsloggMottak
@@ -30,6 +31,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
     }
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
+        clean()
         runMigration()
         logger.info { "Starter applikasjonen" }
     }

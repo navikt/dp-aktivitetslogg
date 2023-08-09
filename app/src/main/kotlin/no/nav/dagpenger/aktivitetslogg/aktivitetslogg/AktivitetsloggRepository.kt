@@ -1,8 +1,9 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import java.util.UUID
 
 internal interface AktivitetsloggRepository {
     fun hentAktivitetslogg(ident: String): List<AktivitetsloggDTO>
-    fun lagre(ident: String, json: String): Int
+    fun lagre(uuid: UUID, ident: String, json: String): Int
 }

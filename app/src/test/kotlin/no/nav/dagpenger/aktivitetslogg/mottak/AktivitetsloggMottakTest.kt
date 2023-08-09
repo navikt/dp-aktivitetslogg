@@ -2,7 +2,7 @@ package no.nav.dagpenger.aktivitetslogg.mottak
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
-import no.nav.dagpenger.aktivitetslogg.db.Postgres.withMigratedDb
+import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test

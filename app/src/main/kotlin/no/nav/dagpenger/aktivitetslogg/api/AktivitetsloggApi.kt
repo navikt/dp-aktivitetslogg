@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
@@ -20,7 +21,6 @@ import io.ktor.server.routing.routing
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
-import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import org.slf4j.event.Level
 
 internal fun Application.aktivitetsloggApi(
@@ -35,6 +35,7 @@ internal fun Application.aktivitetsloggApi(
     }
     install(ContentNegotiation) {
         jackson {
+            registerModule(JavaTimeModule())
         }
     }
 
