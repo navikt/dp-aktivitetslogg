@@ -23,9 +23,11 @@ class AktivitetsloggMottakTest {
 
     @Test
     fun `lagrer meldinger med aktivitetslogg`() {
-        rapid.sendTestMessage(JsonMessage.newMessage("aktivitetslogg", mapOf("ident" to "ident")).toJson())
+        val newMessage = JsonMessage.newMessage("aktivitetslogg", mapOf("ident" to "ident"))
+        rapid.sendTestMessage(newMessage.toJson())
 
         with(repository.hentAktivitetslogg("ident").first()) {
+            println(this)
             this.atEventName shouldBe "aktivitetslogg"
             this.ident shouldBe "ident"
         }

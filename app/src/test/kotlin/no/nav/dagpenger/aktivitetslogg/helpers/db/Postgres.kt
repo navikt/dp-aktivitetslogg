@@ -21,6 +21,7 @@ internal object Postgres {
 
     fun withMigratedDb(): HikariDataSource {
         setup()
+        PostgresDataSourceBuilder.clean()
         PostgresDataSourceBuilder.runMigration()
         return PostgresDataSourceBuilder.dataSource
     }

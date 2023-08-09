@@ -5,6 +5,9 @@ import ch.qos.logback.core.util.OptionHelper.getSystemProperty
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
+import org.flywaydb.core.api.output.CleanResult
+import org.flywaydb.core.internal.configuration.ConfigUtils
+import java.util.Locale
 
 // Understands how to create a data source from environment variables
 internal object PostgresDataSourceBuilder {
@@ -14,7 +17,7 @@ internal object PostgresDataSourceBuilder {
     const val DB_HOST_KEY = "DB_HOST"
     const val DB_PORT_KEY = "DB_PORT"
 
-    private fun getOrThrow(key: String): String = getEnv(key) ?: getSystemProperty(key)
+    private fun getOrThrow(key: String): String = getEnv(key.toSnakeCase()) ?: getSystemProperty(key)
 
     val dataSource by lazy {
         HikariDataSource().apply {
@@ -34,8 +37,8 @@ internal object PostgresDataSourceBuilder {
 
     private val flyWayBuilder: FluentConfiguration = Flyway.configure().connectRetries(10)
 
-    fun clean() = flyWayBuilder
-        .envVars()
+    fun clean(): CleanResult = flyWayBuilder
+        .cleanDisabled(getOrThrow(ConfigUtils.CLEAN_DISABLED).toBooleanStrict())
         .dataSource(dataSource)
         .load()
         .clean()
@@ -49,3 +52,6 @@ internal object PostgresDataSourceBuilder {
             .migrations
             .size
 }
+
+fun String.toSnakeCase() =
+    this.split(Regex("(?=[A-Z])|\\.")).joinToString("_") { it.uppercase(Locale.getDefault()) }
