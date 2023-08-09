@@ -55,6 +55,9 @@ spec:
       claims:
         groups:
           - id: 4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e # teamdagpenger
+    sidecar:
+      enabled: true
+      autoLogin: true
   accessPolicy:
     inbound:
       rules:
