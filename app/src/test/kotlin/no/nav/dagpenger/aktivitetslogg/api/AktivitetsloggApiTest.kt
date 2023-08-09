@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,6 +15,8 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepo
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
+import org.postgresql.util.PSQLException
+import java.util.UUID
 import kotlin.test.Test
 
 class AktivitetsloggApiTest {
@@ -22,11 +25,15 @@ class AktivitetsloggApiTest {
     @Test
     fun testGetAktivitetslogg() = testApplication {
         val aktivitetsloggRepository = PostgresAktivitetsloggRepository(withMigratedDb()).apply {
-            lagre("123", data)
-            lagre("123", data)
-            lagre("123", data)
-            lagre("123", data)
+            lagre(UUID.randomUUID(), "123", data)
+            lagre(UUID.randomUUID(), "123", data)
+            lagre(UUID.randomUUID(), "123", data)
+            with(UUID.randomUUID()) {
+                lagre(this, "123", data)
+                shouldThrow<PSQLException> { lagre(this, "123", data) }
+            }
         }
+
         application {
             aktivitetsloggApi(aktivitetsloggRepository)
         }

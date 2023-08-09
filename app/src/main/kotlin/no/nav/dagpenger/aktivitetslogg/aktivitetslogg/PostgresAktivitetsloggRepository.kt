@@ -6,6 +6,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
+import java.util.UUID
 import javax.sql.DataSource
 
 internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : AktivitetsloggRepository {
@@ -20,12 +21,13 @@ internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : Ak
         )
     }
 
-    override fun lagre(ident: String, json: String) = using(sessionOf(ds)) { session ->
+    override fun lagre(uuid: UUID, ident: String, json: String) = using(sessionOf(ds)) { session ->
         session.run(
             queryOf(
                 //language=PostgreSQL
-                statement = """INSERT INTO aktivitetslogg (ident, json) VALUES (:ident, :json::jsonb)""",
+                statement = """INSERT INTO aktivitetslogg (id, ident, json) VALUES (:uuid, :ident, :json::jsonb)""",
                 paramMap = mapOf(
+                    "uuid" to uuid,
                     "ident" to ident,
                     "json" to json,
                 ),
