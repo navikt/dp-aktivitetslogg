@@ -11,12 +11,18 @@ import java.util.UUID
 import javax.sql.DataSource
 
 internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : AktivitetsloggRepository {
-    override fun hentAktivitetslogg(offset: Int, limit: Int) = hentAktivitetslogg(
+    override fun hentAktivitetslogg(limit: Int, since: UUID?) = hentAktivitetslogg(
         queryOf(
             //language=PostgreSQL
-            statement = """SELECT * FROM aktivitetslogg ORDER BY id DESC LIMIT :limit OFFSET :offset""",
+            statement = """
+                SELECT *
+                FROM aktivitetslogg
+                WHERE (:since::uuid IS NULL OR id > COALESCE((SELECT id FROM aktivitetslogg WHERE melding_id = :since), id))
+                ORDER BY id DESC
+                LIMIT :limit
+            """.trimIndent(),
             paramMap = mapOf(
-                "offset" to offset,
+                "since" to since,
                 "limit" to limit,
             ),
         ),

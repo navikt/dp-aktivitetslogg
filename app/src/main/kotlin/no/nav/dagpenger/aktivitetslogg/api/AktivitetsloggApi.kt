@@ -21,6 +21,7 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
+import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
 internal fun Application.aktivitetsloggApi(
@@ -55,10 +56,10 @@ internal fun Application.aktivitetsloggApi(
             route("/aktivitetslogg") {
                 get {
                     val params = call.request.queryParameters
-                    val offset = params["offset"]?.toIntOrNull() ?: 0
                     val limit = params["limit"]?.toIntOrNull() ?: 50
+                    val since = params["since"]?.toUUID()
 
-                    val rapporteringsperioder = aktivitetsloggRepository.hentAktivitetslogg(offset, limit)
+                    val rapporteringsperioder = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
 
                     call.respond(HttpStatusCode.OK, rapporteringsperioder)
                 }

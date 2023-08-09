@@ -10,6 +10,7 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
+import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
@@ -22,42 +23,67 @@ import kotlin.test.Test
 class AktivitetsloggApiTest {
     private val testToken by mockAzure
 
+    private val første = UUID.randomUUID()
+    private val andre = UUID.randomUUID()
+    private val tredje = UUID.randomUUID()
+    private val fjerde = UUID.randomUUID()
+    private val aktivitetsloggRepository = PostgresAktivitetsloggRepository(withMigratedDb()).apply {
+        lagre(første, "ident", getData(første))
+        lagre(andre, "ident", getData(andre))
+        lagre(tredje, "ident", getData(tredje))
+        lagre(fjerde, "ident", getData(fjerde))
+    }
+
     @Test
-    fun testGetAktivitetslogg() = testApplication {
-        val aktivitetsloggRepository = PostgresAktivitetsloggRepository(withMigratedDb()).apply {
-            lagre(UUID.randomUUID(), "123", data)
-            lagre(UUID.randomUUID(), "123", data)
-            lagre(UUID.randomUUID(), "123", data)
-            with(UUID.randomUUID()) {
-                lagre(this, "123", data)
-                shouldThrow<PSQLException> { lagre(this, "123", data) }
-            }
-        }
+    fun `repository feiler på duplikater`() {
+        shouldThrow<PSQLException> { aktivitetsloggRepository.lagre(fjerde, "ident", getData(fjerde)) }
+    }
 
-        application {
-            aktivitetsloggApi(aktivitetsloggRepository)
-        }
+    @Test
+    fun `kan hente med since og limit`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
 
-        client.config {
-            install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                }
-            }
-        }.get("/aktivitetslogg?offset=1&limit=2") {
+        client().get("/aktivitetslogg?since=$andre&limit=2") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
             val response = this.body<List<AktivitetsloggDTO>>()
             response.size shouldBe 2
+
+            response[0].atId shouldBe fjerde.toString()
+            response[1].atId shouldBe tredje.toString()
+        }
+    }
+
+    @Test
+    fun `kan hente uten argument`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
+
+        client().get("/aktivitetslogg") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<List<AktivitetsloggDTO>>()
+            response.size shouldBe 4
+
+            response[0].atId shouldBe fjerde.toString()
+            response[1].atId shouldBe tredje.toString()
+            response[2].atId shouldBe andre.toString()
+            response[3].atId shouldBe første.toString()
+        }
+    }
+
+    private fun ApplicationTestBuilder.client() = createClient {
+        install(ContentNegotiation) {
+            jackson { registerModule(JavaTimeModule()) }
         }
     }
 }
 
-val data = """
+fun getData(atId: UUID) = """
 {
-  "@id": "d70ece5f-6706-4e78-a23d-0218a23559c5",
-  "ident": "29838099503",
+  "@id": "$atId",
+  "ident": "ident",
   "hendelse": {
     "type": "BeregningsdatoPassertHendelse",
     "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
