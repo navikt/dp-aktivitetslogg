@@ -37,18 +37,19 @@ class AktivitetsloggApiTest {
         application {
             aktivitetsloggApi(aktivitetsloggRepository)
         }
+
         client.config {
             install(ContentNegotiation) {
                 jackson {
                     registerModule(JavaTimeModule())
                 }
             }
-        }.get("/aktivitetslogg") {
+        }.get("/aktivitetslogg?offset=1&limit=2") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
             val response = this.body<List<AktivitetsloggDTO>>()
-            response.size shouldBe 4
+            response.size shouldBe 2
         }
     }
 }

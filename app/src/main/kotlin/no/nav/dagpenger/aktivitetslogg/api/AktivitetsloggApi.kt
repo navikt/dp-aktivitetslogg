@@ -54,7 +54,11 @@ internal fun Application.aktivitetsloggApi(
         authenticate("azureAd") {
             route("/aktivitetslogg") {
                 get {
-                    val rapporteringsperioder = aktivitetsloggRepository.hentAktivitetslogg("ident")
+                    val params = call.request.queryParameters
+                    val offset = params["offset"]?.toIntOrNull() ?: 0
+                    val limit = params["limit"]?.toIntOrNull() ?: 50
+
+                    val rapporteringsperioder = aktivitetsloggRepository.hentAktivitetslogg(offset, limit)
 
                     call.respond(HttpStatusCode.OK, rapporteringsperioder)
                 }
