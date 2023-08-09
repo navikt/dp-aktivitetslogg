@@ -21,6 +21,7 @@ import io.ktor.server.routing.routing
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
+import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import org.slf4j.event.Level
 
 internal fun Application.aktivitetsloggApi(
@@ -35,7 +36,7 @@ internal fun Application.aktivitetsloggApi(
     }
     install(ContentNegotiation) {
         jackson {
-            registerModule(JavaTimeModule())
+            configureJackson()
         }
     }
 

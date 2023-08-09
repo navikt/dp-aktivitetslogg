@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
-private fun ObjectMapper.configureJackson() {
+fun ObjectMapper.configureJackson() {
     registerModule(JavaTimeModule())
     registerModule(
         KotlinModule.Builder().apply {
