@@ -61,4 +61,4 @@ internal object PostgresDataSourceBuilder {
 }
 
 fun String.toSnakeCase() =
-    this.split(Regex("(?=[A-Z])|\\.")).joinToString("_") { it.uppercase(Locale.getDefault()) }
+    this.replace(Regex("([a-z])([A-Z])|\\."), "$1_$2").uppercase(Locale.getDefault())

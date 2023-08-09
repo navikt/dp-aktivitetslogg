@@ -7,8 +7,14 @@ import org.junit.jupiter.api.Test
 class PostgresDataSourceBuilderKtTest {
     @Test
     fun `converts property to env-var`() {
-        val cleanDisabled = ConfigUtils.CLEAN_DISABLED
+        val property = ConfigUtils.CLEAN_DISABLED
 
-        cleanDisabled.toSnakeCase() shouldBe "FLYWAY_CLEAN_DISABLED"
+        property.toSnakeCase() shouldBe "FLYWAY_CLEAN_DISABLED"
+    }
+    @Test
+    fun `does not convert uppercased env-var`() {
+        val property = "DB_HOST"
+
+        property.toSnakeCase() shouldBe "DB_HOST"
     }
 }
