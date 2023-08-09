@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Aktivitetslogg API
+  version: 1.0.0
+  description: API for aktivitetslogg
+  contact:
+    name: '#team-dagpenger'
+servers:
+  - url: https://dp-aktivitetslogg.intern.dev.nav.no
+    description: dev
+paths:
+  /aktivitetslogg:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aktivitetslogg'
+          description: OK
+      summary: Hent aktivitetslogg
+      operationId: get-aktivitetslogg
+      tags:
+        - Aktivitetslogg
+      security:
+        - azureAd: [ ]
+components:
+  schemas:
+    Problem:
+      type: object
+      description: Implementasjon av Problem Details for HTTP APIs [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807)
+      properties:
+        type:
+          type: string
+          format: uri
+          default: about:blank
+          description: URI som identifiserer problemet
+        title:
+          type: string
+          description: En kort oppsummering av problemet
+        status:
+          type: integer
+          description: HTTP status
+        detail:
+          type: string
+          description: Forklaring av problemet
+        instance:
+          type: string
+          format: uri
+          description: Hvor feilen oppstod
+    KontekstMap:
+      type: object
+      additionalProperties:
+        type: string
+
+    Kontekst:
+      type: object
+      properties:
+        kontekstType:
+          type: string
+        kontekstMap:
+          $ref: '#/components/schemas/KontekstMap'
+
+    ParticipatingService:
+      type: object
+      properties:
+        id:
+          type: string
+        time:
+          type: string
+          format: date-time
+
+    Hendelse:
+      type: object
+      properties:
+        type:
+          type: string
+        meldingsreferanseId:
+          type: string
+
+    Aktivitet:
+      type: object
+      properties:
+        kontekster:
+          type: array
+          items:
+            $ref: '#/components/schemas/Kontekst'
+        alvorlighetsgrad:
+          type: string
+        melding:
+          type: string
+        detaljer:
+          type: object
+        tidsstempel:
+          type: string
+          format: date-time
+
+    Aktivitetslogg:
+      type: object
+      properties:
+        "@event_name":
+          type: string
+        hendelse:
+          $ref: '#/components/schemas/Hendelse'
+        ident:
+          type: string
+        aktiviteter:
+          type: array
+          items:
+            $ref: '#/components/schemas/Aktivitet'
+        "@id":
+          type: string
+        "@opprettet":
+          type: string
+          format: date-time
+        system_read_count:
+          type: integer
+        system_participating_services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParticipatingService'
+  securitySchemes:
+    azureAd:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bruker [AzureAD](https://docs.nais.io/security/auth/azure-ad) til autentisering. 
+        Token må ha `audience` satt til `[cluster]:teamdagpenger:dp-rapportering`.
+        
+        For å teste APIet kan du lage et gyldig OBO-token ved å bruke wonderwalled:
+        - [dev-gcp](https://wonderwalled-idporten.intern.dev.nav.no/api/obo?aud=dev-gcp:teamdagpenger:dp-rapportering)
+  headers: { }
+  responses: { }
+
+tags:
+  - name: Aktivitetslogg
+    description: >-
+      Lager en tidslinje med all aktivitet bruker har utført i en periode med
+      rapporteringsplikt

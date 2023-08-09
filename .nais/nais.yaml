@@ -1,0 +1,44 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: dp-aktivitetslogg
+  namespace: teamdagpenger
+  labels:
+    team: teamdagpenger
+spec:
+  image: {{ image }}
+  port: 8080
+  prometheus:
+    enabled: true
+    path: /metrics
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  startup:
+    path: /isready
+  replicas:
+    min: 2
+    max: 2
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  {{ ingresses }}
+  secureLogs:
+    enabled: true
+  kafka:
+    pool: {{ kafka_pool }}
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+      claims:
+        groups:
+          - id: 4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e # teamdagpenger
+  accessPolicy:
+    inbound:
+      rules:
+        - application: dp-aktivitetslogg-frontend

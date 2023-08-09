@@ -1,0 +1,35 @@
+package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
+
+import com.fasterxml.jackson.module.kotlin.readValue
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import kotliquery.using
+import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
+import javax.sql.DataSource
+
+internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : AktivitetsloggRepository {
+    override fun hentAktivitetslogg(ident: String) = using(sessionOf(ds)) { session ->
+        session.run(
+            queryOf(
+                //language=PostgreSQL
+                statement = """SELECT * FROM aktivitetslogg""",
+            ).map {
+                jacksonObjectMapper.readValue<AktivitetsloggDTO>(it.string("json"))
+            }.asList,
+        )
+    }
+
+    override fun lagre(ident: String, json: String) = using(sessionOf(ds)) { session ->
+        session.run(
+            queryOf(
+                //language=PostgreSQL
+                statement = """INSERT INTO aktivitetslogg (ident, json) VALUES (:ident, :json::jsonb)""",
+                paramMap = mapOf(
+                    "ident" to ident,
+                    "json" to json,
+                ),
+            ).asUpdate,
+        )
+    }
+}
