@@ -3,11 +3,14 @@ package no.nav.dagpenger.aktivitetslogg.db
 import ch.qos.logback.core.util.OptionHelper.getEnv
 import ch.qos.logback.core.util.OptionHelper.getSystemProperty
 import com.zaxxer.hikari.HikariDataSource
+import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.flywaydb.core.api.output.CleanResult
 import org.flywaydb.core.internal.configuration.ConfigUtils
 import java.util.Locale
+
+private val logger = KotlinLogging.logger {}
 
 // Understands how to create a data source from environment variables
 internal object PostgresDataSourceBuilder {
@@ -17,7 +20,11 @@ internal object PostgresDataSourceBuilder {
     const val DB_HOST_KEY = "DB_HOST"
     const val DB_PORT_KEY = "DB_PORT"
 
-    private fun getOrThrow(key: String): String = getEnv(key.toSnakeCase()) ?: getSystemProperty(key)
+    private fun getOrThrow(key: String): String =
+        getEnv(
+            key.toSnakeCase()
+                .also { logger.info { "Henter $it fra environment variables" } },
+        ) ?: getSystemProperty(key)
 
     val dataSource by lazy {
         HikariDataSource().apply {
