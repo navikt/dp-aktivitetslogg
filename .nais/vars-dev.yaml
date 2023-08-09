@@ -1,4 +1,9 @@
 kafka_pool: nav-dev
+
+gcp:
+  sql:
+    tier: db-custom-1-3840
+
 ingresses: |
   ingresses:
     - https://dp-aktivitetslogg.intern.dev.nav.no
