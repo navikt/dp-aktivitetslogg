@@ -33,11 +33,11 @@ spec:
     - name: KAFKA_RAPID_TOPIC
       value: teamdagpenger.rapid.v1
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: dp-aktivitetslogg-v1
+      value: dp-aktivitetslogg-v2
     - name: KAFKA_RESET_POLICY
       value: earliest
     - name: FLYWAY_CLEAN_DISABLED
-      value: "false"
+      value: "true"
   kafka:
     pool: {{ kafka_pool }}
   gcp:
