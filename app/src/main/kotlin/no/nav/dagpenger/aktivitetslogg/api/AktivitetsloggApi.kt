@@ -58,10 +58,15 @@ internal fun Application.aktivitetsloggApi(
                     val params = call.request.queryParameters
                     val limit = params["limit"]?.toIntOrNull() ?: 50
                     val since = params["since"]?.toUUID()
+                    val wait = params["wait"]?.toBooleanStrict()
 
-                    val rapporteringsperioder = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
-
-                    call.respond(HttpStatusCode.OK, rapporteringsperioder)
+                    val aktivitetslogger = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
+                    if (aktivitetslogger.isEmpty() && wait == true) {
+                        val nyAktivitet = aktivitetsloggRepository.lytt()
+                        call.respond(HttpStatusCode.OK, nyAktivitet)
+                    } else {
+                        call.respond(HttpStatusCode.OK, aktivitetslogger)
+                    }
                 }
             }
         }

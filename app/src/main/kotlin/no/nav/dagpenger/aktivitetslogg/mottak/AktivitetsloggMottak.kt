@@ -12,7 +12,6 @@ internal class AktivitetsloggMottak(
     rapidsConnection: RapidsConnection,
     private val aktivitetsloggRepository: AktivitetsloggRepository,
 ) : River.PacketListener {
-
     init {
         River(rapidsConnection).validate {
             it.demandValue("@event_name", "aktivitetslogg")

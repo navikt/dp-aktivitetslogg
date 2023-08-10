@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.channels.Channel
 import kotliquery.Query
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -10,7 +11,11 @@ import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import java.util.UUID
 import javax.sql.DataSource
 
-internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : AktivitetsloggRepository {
+internal class PostgresAktivitetsloggRepository(
+    private val ds: DataSource,
+) : AktivitetsloggRepository {
+    private val observers = Channel<List<AktivitetsloggDTO>>()
+
     override fun hentAktivitetslogg(limit: Int, since: UUID?) = hentAktivitetslogg(
         queryOf(
             //language=PostgreSQL
@@ -36,8 +41,10 @@ internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : Ak
     )
 
     private fun hentAktivitetslogg(query: Query) = using(sessionOf(ds)) { session ->
-        session.run(query.map { jacksonObjectMapper.readValue<AktivitetsloggDTO>(it.string("json")) }.asList)
+        session.run(query.map { aktivitetsloggDTO(it.string("json")) }.asList)
     }
+
+    private fun aktivitetsloggDTO(json: String) = jacksonObjectMapper.readValue<AktivitetsloggDTO>(json)
 
     override fun lagre(uuid: UUID, ident: String, json: String) = using(sessionOf(ds)) { session ->
         session.run(
@@ -51,5 +58,9 @@ internal class PostgresAktivitetsloggRepository(private val ds: DataSource) : Ak
                 ),
             ).asUpdate,
         )
+    }.also {
+        observers.trySend(listOf(aktivitetsloggDTO(json)))
     }
+
+    override suspend fun lytt(): List<AktivitetsloggDTO> = observers.receive()
 }

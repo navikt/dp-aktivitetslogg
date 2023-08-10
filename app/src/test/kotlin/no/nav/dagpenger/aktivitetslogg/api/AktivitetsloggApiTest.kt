@@ -12,6 +12,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
@@ -70,6 +72,29 @@ class AktivitetsloggApiTest {
             response[1].atId shouldBe tredje.toString()
             response[2].atId shouldBe andre.toString()
             response[3].atId shouldBe første.toString()
+        }
+    }
+
+    @Test
+    fun `kan vente på nye meldinger`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
+
+        val nyAktivitetslogg = UUID.randomUUID()
+        runBlocking {
+            async {
+                client().get("/aktivitetslogg?since=$fjerde&wait=true") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+                    response.size shouldBe 1
+
+                    response[0].atId shouldBe nyAktivitetslogg.toString()
+                }
+            }
+            async {
+                aktivitetsloggRepository.lagre(nyAktivitetslogg, "ident", getData(nyAktivitetslogg))
+            }
         }
     }
 
