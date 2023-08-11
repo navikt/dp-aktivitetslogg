@@ -66,7 +66,8 @@ internal class PostgresAktivitetsloggRepository(
         )
     }.also {
         logger.info { "Annonserer ny aktivitetslogg med id=$uuid" }
-        messageSharedFlow.tryEmit(listOf(aktivitetsloggDTO(json)))
+        val emitted = messageSharedFlow.tryEmit(listOf(aktivitetsloggDTO(json)))
+        logger.info { "tryEmit as $emitted" }
     }
 
     override fun flow() = messageSharedFlow.asSharedFlow()
