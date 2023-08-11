@@ -66,5 +66,11 @@ internal class PostgresAktivitetsloggRepository(
         observers.trySend(listOf(aktivitetsloggDTO(json)))
     }
 
-    override suspend fun lytt(): List<AktivitetsloggDTO> = observers.receive()
+    override suspend fun lytt(): List<AktivitetsloggDTO> {
+        val uuid = UUID.randomUUID()
+        logger.info { "Starter lytter med $uuid" }
+        val liste = observers.receive()
+        logger.info { "Lytter $uuid løses med ${liste.size}" }
+        return liste
+    }
 }
