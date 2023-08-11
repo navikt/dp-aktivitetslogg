@@ -76,7 +76,7 @@ internal fun Application.aktivitetsloggApi(
                                 logger.info { "Skriver i respondTextWriter" }
                                 write(value.toJson())
                                 logger.info { "Flusher i respondTextWriter" }
-                                flush()
+                                close()
                                 logger.info { "Ferdig i respondTextWriter" }
                             }
                         }
