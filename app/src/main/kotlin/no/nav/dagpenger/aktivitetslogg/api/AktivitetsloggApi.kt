@@ -19,6 +19,7 @@ import io.ktor.server.response.respondTextWriter
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
@@ -26,6 +27,8 @@ import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
+
+private val logger = KotlinLogging.logger {}
 
 internal fun Application.aktivitetsloggApi(
     aktivitetsloggRepository: AktivitetsloggRepository,
@@ -66,10 +69,15 @@ internal fun Application.aktivitetsloggApi(
                     val aktivitetslogger = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
                     if (aktivitetslogger.isEmpty() && wait == true) {
                         val flyt = aktivitetsloggRepository.flow()
+                        logger.info { "Lytter på nye meldinger" }
                         call.respondTextWriter(contentType = ContentType.Application.Json) {
+                            logger.info { "Starter en respondTextWriter" }
                             flyt.collect {
+                                logger.info { "Skriver i respondTextWriter" }
                                 write(it.toJson())
+                                logger.info { "Flusher i respondTextWriter" }
                                 flush()
+                                logger.info { "Ferdig i respondTextWriter" }
                             }
                         }
                     } else {
