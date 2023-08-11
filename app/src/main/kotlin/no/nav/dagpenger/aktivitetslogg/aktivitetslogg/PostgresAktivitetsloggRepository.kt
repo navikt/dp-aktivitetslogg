@@ -2,6 +2,9 @@ package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotliquery.Query
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -17,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 internal class PostgresAktivitetsloggRepository(
     private val ds: DataSource,
 ) : AktivitetsloggRepository {
-    private val observers = Channel<List<AktivitetsloggDTO>>()
+    private val messageSharedFlow = MutableSharedFlow<List<AktivitetsloggDTO>>()
 
     override fun hentAktivitetslogg(limit: Int, since: UUID?) = hentAktivitetslogg(
         queryOf(
@@ -63,14 +66,8 @@ internal class PostgresAktivitetsloggRepository(
         )
     }.also {
         logger.info { "Annonserer ny aktivitetslogg med id=$uuid" }
-        observers.trySend(listOf(aktivitetsloggDTO(json)))
+        messageSharedFlow.tryEmit(listOf(aktivitetsloggDTO(json)))
     }
 
-    override suspend fun lytt(): List<AktivitetsloggDTO> {
-        val uuid = UUID.randomUUID()
-        logger.info { "Starter lytter med $uuid" }
-        val liste = observers.receive()
-        logger.info { "Lytter $uuid løses med ${liste.size}" }
-        return liste
-    }
+    override fun flow() = messageSharedFlow.asSharedFlow()
 }

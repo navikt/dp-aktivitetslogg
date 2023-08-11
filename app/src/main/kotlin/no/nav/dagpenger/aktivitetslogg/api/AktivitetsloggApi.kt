@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
@@ -14,6 +15,7 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondTextWriter
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -21,6 +23,7 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
+import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
@@ -62,8 +65,13 @@ internal fun Application.aktivitetsloggApi(
 
                     val aktivitetslogger = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
                     if (aktivitetslogger.isEmpty() && wait == true) {
-                        val nyAktivitet = aktivitetsloggRepository.lytt()
-                        call.respond(HttpStatusCode.OK, nyAktivitet)
+                        val flyt = aktivitetsloggRepository.flow()
+                        call.respondTextWriter(contentType = ContentType.Application.Json) {
+                            flyt.collect {
+                                write(it.toJson())
+                                flush()
+                            }
+                        }
                     } else {
                         call.respond(HttpStatusCode.OK, aktivitetslogger)
                     }
@@ -72,3 +80,5 @@ internal fun Application.aktivitetsloggApi(
         }
     }
 }
+
+private fun <E> List<E>.toJson() = jacksonObjectMapper.writeValueAsString(this)
