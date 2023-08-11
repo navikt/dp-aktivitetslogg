@@ -72,9 +72,9 @@ internal fun Application.aktivitetsloggApi(
                         logger.info { "Lytter på nye meldinger" }
                         call.respondTextWriter(contentType = ContentType.Application.Json) {
                             logger.info { "Starter en respondTextWriter" }
-                            flyt.collect {
+                            flyt.collect { value ->
                                 logger.info { "Skriver i respondTextWriter" }
-                                write(it.toJson())
+                                write(value.toJson())
                                 logger.info { "Flusher i respondTextWriter" }
                                 flush()
                                 logger.info { "Ferdig i respondTextWriter" }
