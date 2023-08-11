@@ -64,3 +64,7 @@ spec:
     inbound:
       rules:
         - application: dp-aktivitetslogg-frontend
+        {{#if wonderwalled}}
+        - application: wonderwalled-azure
+          namespace: aura
+       {{/if}}
