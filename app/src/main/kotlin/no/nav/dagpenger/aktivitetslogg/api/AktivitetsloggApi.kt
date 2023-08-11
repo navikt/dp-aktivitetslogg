@@ -69,15 +69,10 @@ internal fun Application.aktivitetsloggApi(
                     val aktivitetslogger = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
                     if (aktivitetslogger.isEmpty() && wait == true) {
                         val flyt = aktivitetsloggRepository.flow()
-                        logger.info { "Lytter på nye meldinger" }
                         call.respondTextWriter(contentType = ContentType.Application.Json) {
-                            logger.info { "Starter en respondTextWriter" }
                             flyt.collect { value ->
-                                logger.info { "Skriver i respondTextWriter" }
                                 write(value.toJson())
-                                logger.info { "Flusher i respondTextWriter" }
                                 close()
-                                logger.info { "Ferdig i respondTextWriter" }
                             }
                         }
                     } else {
