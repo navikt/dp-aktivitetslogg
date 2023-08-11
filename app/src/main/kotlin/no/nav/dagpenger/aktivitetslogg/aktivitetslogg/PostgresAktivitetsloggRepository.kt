@@ -6,10 +6,13 @@ import kotliquery.Query
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import java.util.UUID
 import javax.sql.DataSource
+
+private val logger = KotlinLogging.logger {}
 
 internal class PostgresAktivitetsloggRepository(
     private val ds: DataSource,
@@ -59,6 +62,7 @@ internal class PostgresAktivitetsloggRepository(
             ).asUpdate,
         )
     }.also {
+        logger.info { "Annonserer ny aktivitetslogg med id=$uuid" }
         observers.trySend(listOf(aktivitetsloggDTO(json)))
     }
 
