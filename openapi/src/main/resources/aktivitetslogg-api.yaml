@@ -24,8 +24,15 @@ paths:
           description: Finn alle aktivitetslogger etter denne
           required: false
           schema:
-            type: number
-            default: 0
+            type: string
+            format: uuid
+        - name: wait
+          in: query
+          description: Om du vil vente på nye aktivitetslogger
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           content:
