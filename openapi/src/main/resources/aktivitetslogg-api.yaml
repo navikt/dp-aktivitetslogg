@@ -72,6 +72,7 @@ components:
           type: string
           format: uri
           description: Hvor feilen oppstod
+
     KontekstMap:
       type: object
       additionalProperties:
@@ -84,6 +85,9 @@ components:
           type: string
         kontekstMap:
           $ref: '#/components/schemas/KontekstMap'
+      required:
+        - kontekstType
+        - kontekstMap
 
     ParticipatingService:
       type: object
@@ -93,7 +97,12 @@ components:
         time:
           type: string
           format: date-time
-
+        service:
+          type: string
+      required:
+        - id
+        - time
+        - service
     Hendelse:
       type: object
       properties:
@@ -101,6 +110,9 @@ components:
           type: string
         meldingsreferanseId:
           type: string
+      required:
+        - type
+        - meldingsreferanseId
 
     Aktivitet:
       type: object
@@ -117,6 +129,12 @@ components:
           type: object
         tidsstempel:
           type: string
+      required:
+        - alvorlighetsgrad
+        - detaljer
+        - kontekster
+        - melding
+        - tidsstempel
 
     Aktivitetslogg:
       type: object
@@ -142,6 +160,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ParticipatingService'
+      required:
+        - "@event_name"
+        - "@id"
+        - "@opprettet"
+        - aktiviteter
+        - hendelse
+        - ident
+        - system_participating_services
+        - system_read_count
+
   securitySchemes:
     azureAd:
       type: http
