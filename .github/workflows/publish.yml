@@ -33,7 +33,7 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'ci skip')
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Set release tag
