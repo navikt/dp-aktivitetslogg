@@ -15,6 +15,13 @@ version = "1.0"
 
 dependencies {
     implementation(libs.bundles.jackson)
+    testImplementation(kotlin("test"))
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 }
 
 publishing {
