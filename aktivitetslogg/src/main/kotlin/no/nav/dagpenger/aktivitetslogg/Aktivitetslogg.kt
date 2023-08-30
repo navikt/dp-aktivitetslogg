@@ -7,8 +7,8 @@ import no.nav.dagpenger.aktivitetslogg.Aktivitet.Behov
 // Implements Visitor pattern to traverse the messages
 class Aktivitetslogg(
     private var forelder: Aktivitetslogg? = null,
-) : IAktivitetslogg {
-    private val aktiviteter = mutableListOf<Aktivitet>()
+    private val aktiviteter: MutableList<Aktivitet> = mutableListOf(),
+    ) : IAktivitetslogg {
     private val kontekster = mutableListOf<Aktivitetskontekst>()
     private val observers = mutableListOf<AktivitetsloggObserver>()
 
@@ -125,6 +125,10 @@ class Aktivitetslogg(
         }
 
         fun aktivitetslogg() = aktivitetslogg
+    }
+
+    companion object {
+        fun rehydrer(aktiviteter: List<Aktivitet>) = Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())
     }
 }
 
