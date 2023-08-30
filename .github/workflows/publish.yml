@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - aktivitetslogg
+      - aktivitetslogg/**
 
 jobs:
   deploy:
