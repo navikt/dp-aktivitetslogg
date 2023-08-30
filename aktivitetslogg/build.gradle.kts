@@ -11,7 +11,7 @@ repositories {
 }
 
 group = "no.nav.dagpenger"
-version = "1.0"
+//version = "1.0"
 
 dependencies {
     implementation(libs.bundles.jackson)

@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Set release tag
         run: |
-          export TAG_NAME="$(TZ="Europe/Oslo" date +%Y%m%d%H%M%s).$(echo $GITHUB_SHA | cut -c 1-12)"
+          export TAG_NAME="$(TZ="Europe/Oslo" date +%Y%m%d).$(echo $GITHUB_SHA | cut -c 1-6)"
           echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
       - uses: ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e # ratchet:ncipollo/release-action@v1
         with:
