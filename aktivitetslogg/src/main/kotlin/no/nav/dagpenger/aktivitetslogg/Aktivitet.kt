@@ -49,11 +49,11 @@ sealed class Aktivitet(
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) : Aktivitet(id, 0, 'I', melding, tidsstempel, kontekster) {
         companion object {
-            internal fun filter(aktiviteter: List<Aktivitet>): List<Info> {
+             fun filter(aktiviteter: List<Aktivitet>): List<Info> {
                 return aktiviteter.filterIsInstance<Info>()
             }
 
-            internal fun gjenopprett(
+             fun gjenopprett(
                 id: UUID,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
@@ -61,7 +61,7 @@ sealed class Aktivitet(
             ) =
                 Info(id, kontekster, melding, tidsstempel)
 
-            internal fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
+             fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
                 Info(UUID.randomUUID(), kontekster, melding)
         }
 
@@ -109,29 +109,29 @@ sealed class Aktivitet(
         val type: Behovtype,
         kontekster: List<SpesifikkKontekst>,
         private val melding: String,
-        private val detaljer: Map<String, Any?> = emptyMap(),
+        private val detaljer: Map<String, Any> = emptyMap(),
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) : Aktivitet(id, 50, 'N', melding, tidsstempel, kontekster) {
         companion object {
-            internal fun filter(aktiviteter: List<Aktivitet>): List<Behov> {
+            fun filter(aktiviteter: List<Aktivitet>): List<Behov> {
                 return aktiviteter.filterIsInstance<Behov>()
             }
 
-            internal fun gjenopprett(
+            fun gjenopprett(
                 id: UUID,
                 type: Behovtype,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
-                detaljer: Map<String, Any?>,
+                detaljer: Map<String, Any>,
                 tidsstempel: String,
             ) =
                 Behov(id, type, kontekster, melding, detaljer, tidsstempel)
 
-            internal fun opprett(
+            fun opprett(
                 type: Behovtype,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
-                detaljer: Map<String, Any?>,
+                detaljer: Map<String, Any>,
             ) = Behov(
                 UUID.randomUUID(),
                 type,
@@ -191,11 +191,11 @@ sealed class Aktivitet(
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) : Aktivitet(id, 100, 'S', melding, tidsstempel, kontekster) {
         companion object {
-            internal fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> {
+             fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> {
                 return aktiviteter.filterIsInstance<LogiskFeil>()
             }
 
-            internal fun gjenopprett(
+             fun gjenopprett(
                 id: UUID,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
@@ -203,7 +203,7 @@ sealed class Aktivitet(
             ) =
                 LogiskFeil(id, kontekster, melding, tidsstempel)
 
-            internal fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
+             fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
                 LogiskFeil(UUID.randomUUID(), kontekster, melding)
         }
 
