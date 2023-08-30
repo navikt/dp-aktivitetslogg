@@ -5,7 +5,8 @@ on:
     branches-ignore:
       - 'dependabot/**'
     paths-ignore:
-      - aktivitetslogg
+      - .github/workflows/publish.yml
+      - aktivitetslogg/**
 
 jobs:
   build:
