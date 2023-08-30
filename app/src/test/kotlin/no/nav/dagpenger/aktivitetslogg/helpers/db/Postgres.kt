@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariDataSource
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder
 import org.flywaydb.core.internal.configuration.ConfigUtils
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.containers.wait.strategy.Wait
 
 internal object Postgres {
     private val instance by lazy {

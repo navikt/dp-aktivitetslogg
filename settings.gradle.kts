@@ -12,5 +12,6 @@ plugins {
 }
 
 rootProject.name = "dp-aktivitetslogg"
+include("aktivitetslogg")
 include("app")
 include("openapi")
