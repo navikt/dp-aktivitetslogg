@@ -33,7 +33,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         melding: String,
         tidsstempel: String,
     ) {
-        leggTilAktivitet(kontekster, Alvorlighetsgrad.INFO, melding, tidsstempel)
+        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.INFO, melding, tidsstempel)
     }
 
     override fun visitWarn(
@@ -43,7 +43,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         melding: String,
         tidsstempel: String,
     ) {
-        leggTilAktivitet(kontekster, Alvorlighetsgrad.WARN, melding, tidsstempel)
+        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.WARN, melding, tidsstempel)
     }
 
     override fun visitBehov(
@@ -56,6 +56,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         tidsstempel: String,
     ) {
         leggTilBehov(
+            id,
             kontekster,
             Alvorlighetsgrad.BEHOV,
             type,
@@ -73,7 +74,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         melding: String,
         tidsstempel: String,
     ) {
-        leggTilAktivitet(kontekster, Alvorlighetsgrad.ERROR, melding, tidsstempel)
+        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.ERROR, melding, tidsstempel)
     }
 
     override fun visitFunksjonellFeil(
@@ -83,10 +84,11 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         melding: String,
         tidsstempel: String,
     ) {
-        leggTilAktivitet(kontekster, Alvorlighetsgrad.SEVERE, melding, tidsstempel)
+        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.SEVERE, melding, tidsstempel)
     }
 
     private fun leggTilAktivitet(
+        id: UUID,
         kontekster: List<SpesifikkKontekst>,
         alvorlighetsgrad: Alvorlighetsgrad,
         melding: String,
@@ -94,6 +96,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     ) {
         aktiviteter.add(
             mutableMapOf(
+                "id" to id,
                 "kontekster" to map(kontekster),
                 "alvorlighetsgrad" to alvorlighetsgrad.name,
                 "melding" to melding,
@@ -104,6 +107,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     }
 
     private fun leggTilBehov(
+        id: UUID,
         kontekster: List<SpesifikkKontekst>,
         alvorlighetsgrad: Alvorlighetsgrad,
         type: Aktivitet.Behov.Behovtype,
@@ -113,6 +117,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     ) {
         aktiviteter.add(
             mutableMapOf(
+                "id" to id,
                 "kontekster" to map(kontekster),
                 "alvorlighetsgrad" to alvorlighetsgrad.name,
                 "behovtype" to type.toString(),
