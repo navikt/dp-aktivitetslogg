@@ -16,6 +16,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
@@ -110,6 +111,19 @@ class AktivitetsloggApiTest {
             val response = this.body<List<TjenesteDTO>>()
             response.size shouldBe 2
 
+        }
+    }
+
+    @Test
+    fun `kan hente antall aktiviteter`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
+
+        client().get("/aktivitetslogg/antall") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val antallAktiviteter = this.body<AntallAktiviteterDTO>()
+            antallAktiviteter.antall shouldBe 4
         }
     }
 

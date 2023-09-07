@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
+import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.toUUID
@@ -81,6 +82,11 @@ internal fun Application.aktivitetsloggApi(
                 }
                 get("tjenester") {
                     call.respond(HttpStatusCode.OK, aktivitetsloggRepository.hentTjenester())
+                }
+                get("antall") {
+                    call.respond(
+                        HttpStatusCode.OK, aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0)
+                    )
                 }
             }
         }

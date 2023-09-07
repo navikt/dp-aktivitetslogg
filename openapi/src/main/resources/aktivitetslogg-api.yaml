@@ -63,8 +63,27 @@ paths:
       operationId: get-services
       security:
         - azureAd: [ ]
+  /aktivitetslogg/antall:
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/AntallAktiviteter'
+          description: OK
 components:
   schemas:
+    AntallAktiviteter:
+      type: object
+      description: Representerer antall aktiviteter i loggen.
+      properties:
+        antall:
+          type: integer
+          format: int64
+          description: Antall aktiviteter i loggen.
     Tjeneste:
       type: object
       description: Representerer en tjeneste i Kubernetes

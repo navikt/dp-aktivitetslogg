@@ -11,6 +11,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import java.util.UUID
@@ -87,7 +88,7 @@ internal class PostgresAktivitetsloggRepository(
         )
     }
 
-    override fun antallAktiviteter(): Long? = using(sessionOf(ds)) { session ->
+    override fun antallAktiviteter(): AntallAktiviteterDTO? = using(sessionOf(ds)) { session ->
         session.run(
             queryOf(
                 //language=PostgreSQL
@@ -95,10 +96,7 @@ internal class PostgresAktivitetsloggRepository(
                     select count(*)
                     from aktivitetslogg
                 """.trimIndent()
-            ).map { row -> row.long("count") }.asSingle
+            ).map { row -> AntallAktiviteterDTO(row.long("count")) }.asSingle
         )
-
-    }.also {
-         it ?: 0
     }
 }

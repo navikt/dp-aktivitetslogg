@@ -2,6 +2,7 @@ package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import kotlinx.coroutines.flow.SharedFlow
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import java.util.UUID
 
@@ -13,7 +14,7 @@ internal interface AktivitetsloggRepository {
 
     fun hentTjenester(): List<TjenesteDTO>
 
-    fun antallAktiviteter(): Long?
+    fun antallAktiviteter(): AntallAktiviteterDTO?
 }
 
 fun interface AktivitetsloggLytter {
