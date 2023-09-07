@@ -16,7 +16,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
-import no.nav.dagpenger.aktivitetslogg.api.models.ServiceDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
 import org.postgresql.util.PSQLException
@@ -103,11 +103,11 @@ class AktivitetsloggApiTest {
     fun `kan hente alle tjenester`() = testApplication {
         application { aktivitetsloggApi(aktivitetsloggRepository) }
 
-        client().get("/aktivitetslogg/services") {
+        client().get("/aktivitetslogg/tjenester") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
-            val response = this.body<List<ServiceDTO>>()
+            val response = this.body<List<TjenesteDTO>>()
             response.size shouldBe 2
 
         }

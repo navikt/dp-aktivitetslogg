@@ -79,7 +79,7 @@ internal fun Application.aktivitetsloggApi(
                         call.respond(HttpStatusCode.OK, aktivitetslogger)
                     }
                 }
-                get("services") {
+                get("tjenester") {
                     call.respond(HttpStatusCode.OK, aktivitetsloggRepository.hentTjenester())
                 }
             }

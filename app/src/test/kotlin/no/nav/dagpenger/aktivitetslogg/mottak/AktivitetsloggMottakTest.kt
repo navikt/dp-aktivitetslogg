@@ -31,7 +31,7 @@ class AktivitetsloggMottakTest {
                 mapOf(
                     "ident" to "ident",
                     "hendelse" to mapOf("type" to "bar", "meldingsreferanseId" to UUID.randomUUID()),
-                    "aktiviteter" to emptyList<Object>(),
+                    "aktiviteter" to emptyList<Any>(),
                 ),
             )
         rapid.sendTestMessage(newMessage.toJson())

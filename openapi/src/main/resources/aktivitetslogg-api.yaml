@@ -48,7 +48,7 @@ paths:
         - Aktivitetslogg
       security:
         - azureAd: [ ]
-  /aktivitetslogg/services:
+  /aktivitetslogg/tjenester:
     get:
       responses:
         200:
@@ -57,7 +57,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Service'
+                  $ref: '#/components/schemas/Tjeneste'
           description: OK
       summary: Lister ut alle tjenester
       operationId: get-services
@@ -65,13 +65,13 @@ paths:
         - azureAd: [ ]
 components:
   schemas:
-    Service:
+    Tjeneste:
       type: object
-      description: Represents a service in Kubernetes
+      description: Representerer en tjeneste i Kubernetes
       properties:
         name:
           type: string
-          description: Service name in Kubernetes
+          description: Tjenestenavn i Kubernetes
     Problem:
       type: object
       description: Implementasjon av Problem Details for HTTP APIs [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807)
