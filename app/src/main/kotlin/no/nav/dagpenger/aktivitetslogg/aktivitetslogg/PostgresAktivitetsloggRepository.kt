@@ -86,4 +86,19 @@ internal class PostgresAktivitetsloggRepository(
             ).map { row -> TjenesteDTO(name = row.string("name")) }.asList
         )
     }
+
+    override fun antallAktiviteter(): Long? = using(sessionOf(ds)) { session ->
+        session.run(
+            queryOf(
+                //language=PostgreSQL
+                statement = """
+                    select count(*)
+                    from aktivitetslogg
+                """.trimIndent()
+            ).map { row -> row.long("count") }.asSingle
+        )
+
+    }.also {
+         it ?: 0
+    }
 }

@@ -12,6 +12,8 @@ internal interface AktivitetsloggRepository {
     fun flow(): SharedFlow<List<AktivitetsloggDTO>>
 
     fun hentTjenester(): List<TjenesteDTO>
+
+    fun antallAktiviteter(): Long?
 }
 
 fun interface AktivitetsloggLytter {
