@@ -74,15 +74,15 @@ internal class PostgresAktivitetsloggRepository(
     }
 
     override fun flow() = messageSharedFlow.asSharedFlow()
-    override fun hentTjenester(): List<ServiceDTO> = using(sessionOf(ds)) {
-       session -> session.run(queryOf(
+    override fun hentTjenester(): List<ServiceDTO> = using(sessionOf(ds)) { session ->
+        session.run(queryOf(
             //language=PostgreSQL
             statement = """
                 select distinct 
-                    jsonb_array_elements(json->'system_participating_services')->>'service' as name, 
-                    jsonb_array_elements(json->'system_participating_services')->>'instance' as instance 
+                    jsonb_array_elements(json->'system_participating_services')->>'service' as name
                 from aktivitetslogg
             """.trimIndent()
-        ).map { row -> ServiceDTO(name = row.string("name"), instance = row.string("instance")) }.asList)
+        ).map { row -> ServiceDTO(name = row.string("name")) }.asList
+        )
     }
 }
