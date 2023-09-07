@@ -11,6 +11,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.ServiceDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import java.util.UUID
 import javax.sql.DataSource
@@ -73,4 +74,15 @@ internal class PostgresAktivitetsloggRepository(
     }
 
     override fun flow() = messageSharedFlow.asSharedFlow()
+    override fun hentTjenester(): List<ServiceDTO> = using(sessionOf(ds)) {
+       session -> session.run(queryOf(
+            //language=PostgreSQL
+            statement = """
+                select distinct 
+                    jsonb_array_elements(json->'system_participating_services')->>'service' as name, 
+                    jsonb_array_elements(json->'system_participating_services')->>'instance' as instance 
+                from aktivitetslogg
+            """.trimIndent()
+        ).map { row -> ServiceDTO(name = row.string("name"), instance = row.string("instance")) }.asList)
+    }
 }

@@ -2,6 +2,7 @@ package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import kotlinx.coroutines.flow.SharedFlow
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.ServiceDTO
 import java.util.UUID
 
 internal interface AktivitetsloggRepository {
@@ -9,6 +10,8 @@ internal interface AktivitetsloggRepository {
     fun hentAktivitetslogg(ident: String): List<AktivitetsloggDTO>
     fun lagre(uuid: UUID, ident: String, json: String): Int
     fun flow(): SharedFlow<List<AktivitetsloggDTO>>
+
+    fun hentTjenester(): List<ServiceDTO>
 }
 
 fun interface AktivitetsloggLytter {

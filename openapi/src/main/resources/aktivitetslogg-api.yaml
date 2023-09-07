@@ -48,8 +48,33 @@ paths:
         - Aktivitetslogg
       security:
         - azureAd: [ ]
+  /aktivitetslogg/services:
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+          description: OK
+      summary: Lister ut alle tjenester
+      operationId: get-services
+      security:
+        - azureAd: [ ]
 components:
   schemas:
+    Service:
+      type: object
+      description: Represents a service in Kubernetes
+      properties:
+        name:
+          type: string
+          description: Service name
+        instance:
+          type: string
+          description: Instance name in Kubernetes
     Problem:
       type: object
       description: Implementasjon av Problem Details for HTTP APIs [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807)

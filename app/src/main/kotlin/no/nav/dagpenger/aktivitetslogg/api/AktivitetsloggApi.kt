@@ -79,6 +79,9 @@ internal fun Application.aktivitetsloggApi(
                         call.respond(HttpStatusCode.OK, aktivitetslogger)
                     }
                 }
+                get("services") {
+                    call.respond(HttpStatusCode.OK, aktivitetsloggRepository.hentTjenester())
+                }
             }
         }
     }
