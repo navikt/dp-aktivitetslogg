@@ -60,7 +60,9 @@ paths:
                   $ref: '#/components/schemas/Tjeneste'
           description: OK
       summary: Lister ut alle tjenester
-      operationId: get-services
+      operationId: get-tjenester
+      tags:
+        - Aktivitetslogg
       security:
         - azureAd: [ ]
   /aktivitetslogg/antall:
@@ -74,6 +76,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/AntallAktiviteter'
           description: OK
+      summary: Returnerer antall aktiviteter
+      operationId: get-antall-aktiviteter
+      tags:
+        - Aktivitetslogg
+      security:
+        - azureAd: [ ]
 components:
   schemas:
     AntallAktiviteter:
