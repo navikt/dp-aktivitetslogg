@@ -26,6 +26,7 @@ import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
+import no.nav.dagpenger.aktivitetslogg.toStringOrNull
 import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
@@ -66,8 +67,11 @@ internal fun Application.aktivitetsloggApi(
                     val limit = params["limit"]?.toIntOrNull() ?: 50
                     val since = params["since"]?.toUUID()
                     val wait = params["wait"]?.toBooleanStrict()
+                    val ident = params["ident"]?.toStringOrNull()
+                    val tjeneste = params["tjeneste"]?.toStringOrNull()
 
-                    val aktivitetslogger = aktivitetsloggRepository.hentAktivitetslogg(limit, since)
+                    val aktivitetslogger =
+                        aktivitetsloggRepository.hentAktivitetslogg(ident, tjeneste, limit = limit, since = since)
                     if (aktivitetslogger.isEmpty() && wait == true) {
                         val flyt = aktivitetsloggRepository.flow()
                         call.respondTextWriter(contentType = ContentType.Application.Json) {

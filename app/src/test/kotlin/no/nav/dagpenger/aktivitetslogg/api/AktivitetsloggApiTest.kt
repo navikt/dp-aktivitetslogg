@@ -32,15 +32,15 @@ class AktivitetsloggApiTest {
     private val tredje = UUID.randomUUID()
     private val fjerde = UUID.randomUUID()
     private val aktivitetsloggRepository = PostgresAktivitetsloggRepository(withMigratedDb()).apply {
-        lagre(første, "ident", getData(første))
-        lagre(andre, "ident", getData(andre))
-        lagre(tredje, "ident", getData(tredje))
-        lagre(fjerde, "ident", getData(fjerde))
+        lagre(første, "1", getData(første, "1"))
+        lagre(andre, "2", getData(andre, "2"))
+        lagre(tredje, "3", getData(tredje, "3"))
+        lagre(fjerde, "3", getData(fjerde, "3"))
     }
 
     @Test
     fun `repository feiler på duplikater`() {
-        shouldThrow<PSQLException> { aktivitetsloggRepository.lagre(fjerde, "ident", getData(fjerde)) }
+        shouldThrow<PSQLException> { aktivitetsloggRepository.lagre(fjerde, "1", getData(fjerde, "1")) }
     }
 
     @Test
@@ -56,6 +56,57 @@ class AktivitetsloggApiTest {
 
             response[0].atId shouldBe fjerde.toString()
             response[1].atId shouldBe tredje.toString()
+        }
+    }
+
+    @Test
+    fun `kan hente på ident`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
+
+        client().get("/aktivitetslogg?ident=3") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<List<AktivitetsloggDTO>>()
+
+            response.size shouldBe 2
+
+            response[0].ident shouldBe "3"
+            response[1].ident shouldBe "3"
+        }
+
+        client().get("/aktivitetslogg?ident=333") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<List<AktivitetsloggDTO>>()
+
+            response.size shouldBe 0
+        }
+    }
+
+    @Test
+    fun `kan hente på tjeneste`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository) }
+
+        client().get("/aktivitetslogg?tjeneste=dp-vedtak") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<List<AktivitetsloggDTO>>()
+
+            response.size shouldBe 0
+        }
+
+        client().get("/aktivitetslogg?tjeneste=dp-rapportering") {
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<List<AktivitetsloggDTO>>()
+
+            response.size shouldBe 4
+
+            response[0].systemParticipatingServices[0].service shouldBe "dp-rapportering"
         }
     }
 
@@ -95,7 +146,7 @@ class AktivitetsloggApiTest {
                 }
             }
             async {
-                aktivitetsloggRepository.lagre(nyAktivitetslogg, "ident", getData(nyAktivitetslogg))
+                aktivitetsloggRepository.lagre(nyAktivitetslogg, "1", getData(nyAktivitetslogg, "1"))
             }
         }
     }
@@ -134,10 +185,10 @@ class AktivitetsloggApiTest {
     }
 }
 
-fun getData(atId: UUID) = """
+fun getData(atId: UUID, ident: String) = """
 {
   "@id": "$atId",
-  "ident": "ident",
+  "ident": "$ident",
   "hendelse": {
     "type": "BeregningsdatoPassertHendelse",
     "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
@@ -151,7 +202,7 @@ fun getData(atId: UUID) = """
       "kontekster": [
         {
           "kontekstMap": {
-            "ident": "29838099503",
+            "ident": "$ident",
             "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
           },
           "kontekstType": "BeregningsdatoPassertHendelse"

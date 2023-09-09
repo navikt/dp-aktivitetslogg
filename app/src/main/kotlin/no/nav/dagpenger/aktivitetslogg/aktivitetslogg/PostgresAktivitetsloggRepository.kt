@@ -24,17 +24,22 @@ internal class PostgresAktivitetsloggRepository(
 ) : AktivitetsloggRepository {
     private val messageSharedFlow = MutableSharedFlow<List<AktivitetsloggDTO>>()
 
-    override fun hentAktivitetslogg(limit: Int, since: UUID?) = hentAktivitetslogg(
+    override fun hentAktivitetslogg(ident: String?, tjeneste: String?, limit: Int, since: UUID?) = hentAktivitetslogg(
+
         queryOf(
             //language=PostgreSQL
             statement = """
                 SELECT *
                 FROM aktivitetslogg
                 WHERE (:since::uuid IS NULL OR id > COALESCE((SELECT id FROM aktivitetslogg WHERE melding_id = :since), id))
+                AND (:ident::text IS NULL OR ident = :ident)
+                AND (:tjeneste::text IS NULL OR json->'system_participating_services' @> '[{"service": "$tjeneste"}]' )
                 ORDER BY id DESC
                 LIMIT :limit
             """.trimIndent(),
             paramMap = mapOf(
+                "ident" to ident,
+                "tjeneste" to tjeneste,
                 "since" to since,
                 "limit" to limit,
             ),
