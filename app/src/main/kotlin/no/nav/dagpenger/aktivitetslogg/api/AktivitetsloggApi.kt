@@ -24,6 +24,7 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
+import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.dagpenger.aktivitetslogg.toStringOrNull
@@ -34,6 +35,7 @@ private val logger = KotlinLogging.logger {}
 
 internal fun Application.aktivitetsloggApi(
     aktivitetsloggRepository: AktivitetsloggRepository,
+    secretService: SecretService
 ) {
     install(CallLogging) {
         disableDefaultColors()
@@ -90,6 +92,11 @@ internal fun Application.aktivitetsloggApi(
                 get("antall") {
                     call.respond(
                         HttpStatusCode.OK, aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0)
+                    )
+                }
+                get("publicKey") {
+                    call.respond(
+                        HttpStatusCode.OK, mapOf("publicKey" to secretService.publicKeyAsString())
                     )
                 }
             }

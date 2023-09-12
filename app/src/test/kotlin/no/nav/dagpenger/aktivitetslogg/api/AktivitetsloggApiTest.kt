@@ -2,6 +2,7 @@ package no.nav.dagpenger.aktivitetslogg.api
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -18,11 +19,12 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepo
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
+import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
+import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import java.util.UUID
-import kotlin.test.Test
 
 class AktivitetsloggApiTest {
     private val testToken by mockAzure
@@ -37,6 +39,7 @@ class AktivitetsloggApiTest {
         lagre(tredje, "3", getData(tredje, "3"))
         lagre(fjerde, "3", getData(fjerde, "3"))
     }
+    private val secretService = SecretService()
 
     @Test
     fun `repository feiler på duplikater`() {
@@ -45,7 +48,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente med since og limit`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg?since=$andre&limit=2") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -61,7 +64,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente på ident`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg?ident=3") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -87,7 +90,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente på tjeneste`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg?tjeneste=dp-vedtak") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -112,7 +115,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente uten argument`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -130,7 +133,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan vente på nye meldinger`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         val nyAktivitetslogg = UUID.randomUUID()
         runBlocking {
@@ -153,7 +156,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente alle tjenester`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg/tjenester") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -167,7 +170,7 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente antall aktiviteter`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository) }
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
         client().get("/aktivitetslogg/antall") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -176,6 +179,20 @@ class AktivitetsloggApiTest {
             val antallAktiviteter = this.body<AntallAktiviteterDTO>()
             antallAktiviteter.antall shouldBe 4
         }
+    }
+
+    @Test
+    fun `kan hente public key`() = testApplication {
+        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
+
+        client().get("/aktivitetslogg/publicKey"){
+            header(HttpHeaders.Authorization, "Bearer $testToken")
+        }.apply {
+            status shouldBe HttpStatusCode.OK
+            val response = this.body<Map<String, String>>()
+            response shouldContainKey "publicKey"
+        }
+
     }
 
     private fun ApplicationTestBuilder.client() = createClient {
