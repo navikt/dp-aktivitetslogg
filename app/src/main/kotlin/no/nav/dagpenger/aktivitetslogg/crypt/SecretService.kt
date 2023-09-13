@@ -19,7 +19,7 @@ class SecretService {
         instance.initialize(2048, SecureRandom())
         this.keyPair = instance.generateKeyPair()
 
-        sikkerLogger.info { "PublicKey: ${keyPair.private}" }
+        sikkerLogger.info { "PublicKey: ${Base64.getEncoder().encodeToString(keyPair.private.encoded)}" }
     }
 
     fun publicKeyAsString(): String = Base64.getEncoder().encodeToString(keyPair.public.encoded)
