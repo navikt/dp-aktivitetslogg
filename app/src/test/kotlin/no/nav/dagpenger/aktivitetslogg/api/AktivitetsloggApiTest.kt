@@ -68,8 +68,9 @@ class AktivitetsloggApiTest {
     @Test
     fun `kan hente på ident`() = testApplication {
         application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
+        val encryptedIdent = secretService.encrypt("3", secretService.publicKeyAsString())
 
-        client().get("/aktivitetslogg?ident=${URLEncoder.encode(secretService.encrypt("3", secretService.publicKeyAsString()), "UTF-8")}") {
+        client().get("/aktivitetslogg?ident=$encryptedIdent") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
@@ -81,7 +82,7 @@ class AktivitetsloggApiTest {
             response[1].ident shouldBe "3"
         }
 
-        client().get("/aktivitetslogg?ident=${URLEncoder.encode(secretService.encrypt("333", secretService.publicKeyAsString()), "UTF-8")}") {
+        client().get("/aktivitetslogg?ident=${secretService.encrypt("333", secretService.publicKeyAsString())}") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK

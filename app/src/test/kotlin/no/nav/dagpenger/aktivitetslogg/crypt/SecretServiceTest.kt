@@ -19,7 +19,8 @@ class SecretServiceTest {
     fun `decrypted ident skal være lik ident i klar tekst`() {
 
         val decryptedIdent = secretService.encrypt(ident, secretService.publicKeyAsString())
-            .toDecryptedStringOrNull(secretService.privateKey())
+            .urlDecode()
+            ?.toDecryptedStringOrNull(secretService.privateKey())
 
         decryptedIdent shouldNotBe null
         decryptedIdent shouldBe ident

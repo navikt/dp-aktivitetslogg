@@ -14,6 +14,7 @@ import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.path
+import io.ktor.server.request.uri
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondTextWriter
 import io.ktor.server.routing.get
@@ -34,6 +35,7 @@ import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger {}
+private val sikkerLogger = KotlinLogging.logger("tjenestkall")
 
 internal fun Application.aktivitetsloggApi(
     aktivitetsloggRepository: AktivitetsloggRepository,
@@ -67,12 +69,15 @@ internal fun Application.aktivitetsloggApi(
         authenticate("azureAd") {
             route("/aktivitetslogg") {
                 get {
+                    logger.info { call.request.uri }
                     val params = call.request.queryParameters
                     val limit = params["limit"]?.toIntOrNull() ?: 50
                     val since = params["since"]?.toUUID()
                     val wait = params["wait"]?.toBooleanStrict()
                     val ident = params["ident"]?.toDecryptedStringOrNull(secretService.privateKey())
                     val tjeneste = params["tjeneste"]?.toStringOrNull()
+
+                    sikkerLogger.info { "Ident=$ident" }
 
                     val aktivitetslogger =
                         aktivitetsloggRepository.hentAktivitetslogg(ident, tjeneste, limit = limit, since = since)

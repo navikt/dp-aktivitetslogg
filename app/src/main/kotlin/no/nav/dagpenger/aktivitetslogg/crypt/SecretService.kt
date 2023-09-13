@@ -36,10 +36,9 @@ class SecretService {
 }
 
 fun String.toDecryptedStringOrNull(privateKey: PrivateKey): String? {
-    return if (this == "null"){
+    return if (this == "null") {
         null
-    }
-    else {
+    } else {
         val decryptCipher = Cipher.getInstance("RSA")
         decryptCipher.init(Cipher.DECRYPT_MODE, privateKey)
 
