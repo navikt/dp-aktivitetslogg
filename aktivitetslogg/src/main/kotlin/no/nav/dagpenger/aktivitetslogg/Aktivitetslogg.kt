@@ -28,6 +28,10 @@ class Aktivitetslogg(
         add(kode.varsel(kontekster.toSpesifikk()))
     }
 
+    override fun audit(melding: String) {
+        add(Aktivitet.Audit.opprett(kontekster.toSpesifikk(), melding = melding))
+    }
+
     override fun funksjonellFeil(kode: Varselkode) {
         TODO("Brukes i kombinasjon med varsel til saksbehandler")
         // add(kode.funksjonellFeil(kontekster.toSpesifikk()))
