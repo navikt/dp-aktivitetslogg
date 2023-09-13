@@ -49,11 +49,11 @@ sealed class Aktivitet(
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) : Aktivitet(id, 0, 'I', melding, tidsstempel, kontekster) {
         companion object {
-             fun filter(aktiviteter: List<Aktivitet>): List<Info> {
+            fun filter(aktiviteter: List<Aktivitet>): List<Info> {
                 return aktiviteter.filterIsInstance<Info>()
             }
 
-             fun gjenopprett(
+            fun gjenopprett(
                 id: UUID,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
@@ -61,7 +61,7 @@ sealed class Aktivitet(
             ) =
                 Info(id, kontekster, melding, tidsstempel)
 
-             fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
+            fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
                 Info(UUID.randomUUID(), kontekster, melding)
         }
 
@@ -191,11 +191,11 @@ sealed class Aktivitet(
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) : Aktivitet(id, 100, 'S', melding, tidsstempel, kontekster) {
         companion object {
-             fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> {
+            fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> {
                 return aktiviteter.filterIsInstance<LogiskFeil>()
             }
 
-             fun gjenopprett(
+            fun gjenopprett(
                 id: UUID,
                 kontekster: List<SpesifikkKontekst>,
                 melding: String,
@@ -203,7 +203,7 @@ sealed class Aktivitet(
             ) =
                 LogiskFeil(id, kontekster, melding, tidsstempel)
 
-             fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
+            fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
                 LogiskFeil(UUID.randomUUID(), kontekster, melding)
         }
 
@@ -211,4 +211,29 @@ sealed class Aktivitet(
             visitor.visitWarn(id, kontekster, this, melding, tidsstempel)
         }
     }
+
+    class Audit private constructor(
+        id: UUID,
+        private val melding: String,
+        kontekster: List<SpesifikkKontekst>,
+        private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
+    ) :
+        Aktivitet(id, 60, 'A', melding, tidsstempel, kontekster) {
+        init {
+            require(
+                kontekster.any { it.kontekstType == AuditKontekst.kontekstType }
+            ) { "Audit melding må ha en kontekst av type AuditKontekst" }
+        }
+
+        override fun accept(visitor: AktivitetsloggVisitor) {
+            visitor.visitAudit(id, kontekster, this, melding, tidsstempel)
+        }
+
+        companion object {
+            fun opprett(kontekster: List<SpesifikkKontekst>, melding: String): Aktivitet {
+                return Audit(UUID.randomUUID(), melding, kontekster)
+            }
+        }
+    }
+
 }

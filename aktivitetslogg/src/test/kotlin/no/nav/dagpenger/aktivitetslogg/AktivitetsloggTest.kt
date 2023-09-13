@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.util.UUID
 
@@ -130,6 +131,31 @@ internal class AktivitetsloggTest {
         assertEquals(param1, aktivitetslogg.behov().first().detaljer()["param1"])
         assertEquals(param2, aktivitetslogg.behov().first().detaljer()["param2"])
     }
+
+
+    @Test
+    fun `audit aktivitet`() {
+
+        val hendelse = TestHendelse("Hendelse", aktivitetslogg)
+        assertThrows<IllegalArgumentException> {
+            hendelse.audit(
+                melding = "sett på vedtak",
+            )
+        }
+        hendelse.kontekst(
+            AuditKontekst(
+                borgerIdent = "12345678901",
+                saksbehandlerNavIdent = "X123456",
+                alvorlighetsgrad = AuditKontekst.Alvorlighetsgrad.INFO,
+                operasjon = AuditKontekst.Operasjon.READ
+            )
+        )
+        hendelse.audit(
+            melding = "sett på vedtak",
+        )
+        assertAudit("sett på vedtak")
+    }
+
     private fun assertLogiskfeil(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
         var visitorCalled = false
         aktivitetslogg.accept(
@@ -139,6 +165,26 @@ internal class AktivitetsloggTest {
                     id: UUID,
                     kontekster: List<SpesifikkKontekst>,
                     aktivitet: Aktivitet.LogiskFeil,
+                    melding: String,
+                    tidsstempel: String,
+                ) {
+                    visitorCalled = true
+                    assertEquals(message, melding)
+                }
+            },
+        )
+        assertTrue(visitorCalled)
+    }
+
+    private fun assertAudit(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
+        var visitorCalled = false
+        aktivitetslogg.accept(
+            object : AktivitetsloggVisitor {
+
+                override fun visitAudit(
+                    id: UUID,
+                    kontekster: List<SpesifikkKontekst>,
+                    audit: Aktivitet.Audit,
                     melding: String,
                     tidsstempel: String,
                 ) {
