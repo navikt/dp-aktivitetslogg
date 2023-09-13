@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.crypt
 
+import mu.KotlinLogging
 import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -10,12 +11,15 @@ import javax.crypto.Cipher
 
 class SecretService {
 
+    private val sikkerLogger = KotlinLogging.logger("tjenestkall")
     private val keyPair: KeyPair
 
     init {
         val instance = KeyPairGenerator.getInstance("RSA")
         instance.initialize(2048, SecureRandom())
         this.keyPair = instance.generateKeyPair()
+
+        sikkerLogger.info { "PublicKey: ${keyPair.private}" }
     }
 
     fun publicKeyAsString(): String = Base64.getEncoder().encodeToString(keyPair.public.encoded)
