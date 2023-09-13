@@ -24,6 +24,7 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
@@ -94,9 +95,9 @@ internal fun Application.aktivitetsloggApi(
                         HttpStatusCode.OK, aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0)
                     )
                 }
-                get("publicKey") {
+                get("keys") {
                     call.respond(
-                        HttpStatusCode.OK, mapOf("publicKey" to secretService.publicKeyAsString())
+                        HttpStatusCode.OK, KeysDTO(public = secretService.publicKeyAsString())
                     )
                 }
             }

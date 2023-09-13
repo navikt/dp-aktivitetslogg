@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -18,6 +19,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
+import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
@@ -185,12 +187,12 @@ class AktivitetsloggApiTest {
     fun `kan hente public key`() = testApplication {
         application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
-        client().get("/aktivitetslogg/publicKey"){
+        client().get("/aktivitetslogg/keys"){
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
-            val response = this.body<Map<String, String>>()
-            response shouldContainKey "publicKey"
+            val response = this.body<KeysDTO>()
+            response.public shouldNotBe null
         }
 
     }
