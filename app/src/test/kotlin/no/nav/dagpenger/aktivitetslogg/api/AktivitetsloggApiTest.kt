@@ -2,7 +2,6 @@ package no.nav.dagpenger.aktivitetslogg.api
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.client.call.body
@@ -22,10 +21,12 @@ import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
+import no.nav.dagpenger.aktivitetslogg.crypt.encrypt
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
+import java.net.URLEncoder
 import java.util.UUID
 
 class AktivitetsloggApiTest {
@@ -68,7 +69,7 @@ class AktivitetsloggApiTest {
     fun `kan hente på ident`() = testApplication {
         application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
-        client().get("/aktivitetslogg?ident=3") {
+        client().get("/aktivitetslogg?ident=${URLEncoder.encode(secretService.encrypt("3", secretService.publicKeyAsString()), "UTF-8")}") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
@@ -80,7 +81,7 @@ class AktivitetsloggApiTest {
             response[1].ident shouldBe "3"
         }
 
-        client().get("/aktivitetslogg?ident=333") {
+        client().get("/aktivitetslogg?ident=${URLEncoder.encode(secretService.encrypt("333", secretService.publicKeyAsString()), "UTF-8")}") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
@@ -187,7 +188,7 @@ class AktivitetsloggApiTest {
     fun `kan hente public key`() = testApplication {
         application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
 
-        client().get("/aktivitetslogg/keys"){
+        client().get("/aktivitetslogg/keys") {
             header(HttpHeaders.Authorization, "Bearer $testToken")
         }.apply {
             status shouldBe HttpStatusCode.OK
