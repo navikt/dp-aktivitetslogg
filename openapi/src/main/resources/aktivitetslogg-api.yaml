@@ -35,7 +35,7 @@ paths:
             default: false
         - name: ident
           in: query
-          description: Identiteten til den aktivitetene gjelder for
+          description: Kryptert identitet til den aktivitetene gjelder for
           required: false
           schema:
             type: string

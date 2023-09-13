@@ -26,6 +26,7 @@ import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
+import no.nav.dagpenger.aktivitetslogg.crypt.toDecryptedStringOrNull
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.dagpenger.aktivitetslogg.toStringOrNull
@@ -70,7 +71,7 @@ internal fun Application.aktivitetsloggApi(
                     val limit = params["limit"]?.toIntOrNull() ?: 50
                     val since = params["since"]?.toUUID()
                     val wait = params["wait"]?.toBooleanStrict()
-                    val ident = params["ident"]?.toStringOrNull()
+                    val ident = params["ident"]?.toDecryptedStringOrNull(secretService.privateKey())
                     val tjeneste = params["tjeneste"]?.toStringOrNull()
 
                     val aktivitetslogger =
