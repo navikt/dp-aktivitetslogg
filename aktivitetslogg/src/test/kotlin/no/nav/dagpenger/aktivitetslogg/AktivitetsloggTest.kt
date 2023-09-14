@@ -1,5 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.aktivitetslogg.serde.AktivitetsloggJsonBuilderTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +37,7 @@ internal class AktivitetsloggTest {
     @Test
     fun `logisk feil oppdaget og kaster exception`() {
         val melding = "Severe error"
-        org.junit.jupiter.api.assertThrows<Aktivitetslogg.AktivitetException> { aktivitetslogg.logiskFeil(melding) }
+        assertThrows<Aktivitetslogg.AktivitetException> { aktivitetslogg.logiskFeil(melding) }
         // assertTrue(aktivitetslogg.hasErrors())
         assertTrue(aktivitetslogg.toString().contains(melding))
         assertLogiskfeil(melding)
@@ -135,7 +137,6 @@ internal class AktivitetsloggTest {
 
     @Test
     fun `audit aktivitet`() {
-
         val hendelse = TestHendelse("Hendelse", aktivitetslogg)
         assertThrows<IllegalArgumentException> {
             hendelse.audit(

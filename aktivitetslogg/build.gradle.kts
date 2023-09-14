@@ -16,6 +16,8 @@ group = "no.nav.dagpenger"
 dependencies {
     implementation(libs.bundles.jackson)
     testImplementation(kotlin("test"))
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.assertions.json)
 }
 
 tasks {
