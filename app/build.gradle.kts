@@ -24,7 +24,7 @@ dependencies {
     testImplementation(libs.bundles.ktor.client)
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.bundles.kotest.assertions)
-    testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.2")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.4")
     testImplementation(libs.mock.oauth2.server)
 }
 
