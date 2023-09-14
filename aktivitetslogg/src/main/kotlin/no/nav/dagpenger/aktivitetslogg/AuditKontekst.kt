@@ -4,16 +4,14 @@ package no.nav.dagpenger.aktivitetslogg
  * @constructor
  * @param borgerIdent Fødselsnummer på borgeren
  * @param saksbehandlerNavIdent NAV-ID på ansatt: A123456. T-ID (abc1234), epost (fornavn.etternavn@nav.no), orgnummer, Fødselsnummer/DNR (for partnere som autentiserer med ID-porten, eller selvbetjening via ID-porten)
- * @param beskrivelse Beskrivelse av hendelsen
- * @param melding En menneskelesbar beskrivelse av hendelsen, tanken er at "average joe" må kunne forstå hva som skjedde
  * @param alvorlighetsgrad Alvorlighetsgraden av hendelsen: INFO, WARN
  * @param operasjon Hvilken operasjon som ble utført: CREATE, READ, UPDATE, DELETE
  */
-data class AuditKontekst(
-    val borgerIdent: String,
-    val saksbehandlerNavIdent: String,
-    val alvorlighetsgrad: Alvorlighetsgrad,
-    val operasjon: Operasjon
+class AuditKontekst(
+    private val borgerIdent: String,
+    private val saksbehandlerNavIdent: String,
+    private val alvorlighetsgrad: Alvorlighetsgrad,
+    private val operasjon: Operasjon
 ) : Aktivitetskontekst {
 
     private val appNavn: String = System.getenv("NAIS_APP_NAME") ?: "dagpenger-aktivitetslogg-ukjent"

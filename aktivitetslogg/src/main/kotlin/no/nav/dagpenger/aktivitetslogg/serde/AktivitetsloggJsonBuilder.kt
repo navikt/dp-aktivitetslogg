@@ -8,7 +8,7 @@ import no.nav.dagpenger.aktivitetslogg.Varselkode
 import java.util.UUID
 
 class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : AktivitetsloggVisitor {
-    internal val aktiviteter = mutableListOf<Map<String, Any>>()
+    private val aktiviteter = mutableListOf<Map<String, Any>>()
 
     init {
         aktivitetslogg.accept(this)
@@ -24,6 +24,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         BEHOV,
         ERROR,
         SEVERE,
+        AUDIT,
     }
 
     override fun visitInfo(
@@ -87,6 +88,16 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         leggTilAktivitet(id, kontekster, Alvorlighetsgrad.SEVERE, melding, tidsstempel)
     }
 
+    override fun visitAudit(
+        id: UUID,
+        kontekster: List<SpesifikkKontekst>,
+        audit: Aktivitet.Audit,
+        melding: String,
+        tidsstempel: String
+    ) {
+        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.AUDIT, melding, tidsstempel)
+    }
+
     private fun leggTilAktivitet(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
@@ -120,7 +131,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
                 "id" to id,
                 "kontekster" to map(kontekster),
                 "alvorlighetsgrad" to alvorlighetsgrad.name,
-                "behovtype" to type.toString(),
+                "behovtype" to type.name,
                 "melding" to melding,
                 "detaljer" to detaljer,
                 "tidsstempel" to tidsstempel,

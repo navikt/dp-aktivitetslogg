@@ -218,7 +218,7 @@ sealed class Aktivitet(
         kontekster: List<SpesifikkKontekst>,
         private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
     ) :
-        Aktivitet(id, 60, 'A', melding, tidsstempel, kontekster) {
+        Aktivitet(id, 0, 'A', melding, tidsstempel, kontekster) {
         init {
             require(
                 kontekster.any { it.kontekstType == AuditKontekst.kontekstType }
