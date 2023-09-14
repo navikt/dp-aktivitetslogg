@@ -1,9 +1,9 @@
 package no.nav.dagpenger.aktivitetslogg.helpers.db
 
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder
 import org.flywaydb.core.internal.configuration.ConfigUtils
 import org.testcontainers.containers.PostgreSQLContainer
+import javax.sql.DataSource
 
 internal object Postgres {
     private val instance by lazy {
@@ -19,7 +19,7 @@ internal object Postgres {
         }
     }
 
-    fun withMigratedDb(): HikariDataSource {
+    fun withMigratedDb(): DataSource {
         setup()
         PostgresDataSourceBuilder.clean()
         PostgresDataSourceBuilder.runMigration()
