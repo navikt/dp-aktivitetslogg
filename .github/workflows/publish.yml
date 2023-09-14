@@ -28,6 +28,7 @@ jobs:
         with:
           gradle-version: wrapper
           dependency-graph: generate-and-submit
+          build-root-directory: aktivitetslogg
           arguments: --configuration-cache test
   release:
     name: Create Release
