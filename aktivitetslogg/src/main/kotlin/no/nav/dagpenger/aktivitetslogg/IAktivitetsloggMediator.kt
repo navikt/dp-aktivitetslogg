@@ -7,7 +7,7 @@ interface PersonHendelse : Aktivitetskontekst, IAktivitetslogg {
     fun meldingsreferanseId(): String
 }
 
-interface IAktivitetsloggMediator {
+class AktivitetsloggEventMapper {
     fun håndter(personHendelse: PersonHendelse, publish: (AktivitetsLoggMelding) -> Unit) {
         publish(
             AktivitetsLoggMelding(
