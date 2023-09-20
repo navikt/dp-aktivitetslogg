@@ -1,10 +1,11 @@
 package no.nav.dagpenger.aktivitetslogg
 
 import no.nav.dagpenger.aktivitetslogg.serde.AktivitetsloggJsonBuilder
+import java.util.UUID
 
 interface AktivitetsloggHendelse  : Aktivitetskontekst, IAktivitetslogg {
     fun ident(): String
-    fun meldingsreferanseId(): String
+    fun meldingsreferanseId(): UUID
 }
 
 class AktivitetsloggEventMapper {
@@ -14,7 +15,7 @@ class AktivitetsloggEventMapper {
                 mapOf(
                     "hendelse" to mapOf(
                         "type" to personHendelse.toSpesifikkKontekst().kontekstType,
-                        "meldingsreferanseId" to personHendelse.meldingsreferanseId(),
+                        "meldingsreferanseId" to personHendelse.meldingsreferanseId().toString(),
                     ),
                     "ident" to personHendelse.ident(),
                     "aktiviteter" to AktivitetsloggJsonBuilder(personHendelse).asList(),
