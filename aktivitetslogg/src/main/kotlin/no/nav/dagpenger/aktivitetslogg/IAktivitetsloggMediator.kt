@@ -2,15 +2,15 @@ package no.nav.dagpenger.aktivitetslogg
 
 import no.nav.dagpenger.aktivitetslogg.serde.AktivitetsloggJsonBuilder
 
-interface PersonHendelse : Aktivitetskontekst, IAktivitetslogg {
+interface AktivitetsloggHendelse  : Aktivitetskontekst, IAktivitetslogg {
     fun ident(): String
     fun meldingsreferanseId(): String
 }
 
 class AktivitetsloggEventMapper {
-    fun håndter(personHendelse: PersonHendelse, publish: (AktivitetsLoggMelding) -> Unit) {
+    fun håndter(personHendelse: AktivitetsloggHendelse, publish: (AktivitetsloggMelding) -> Unit) {
         publish(
-            AktivitetsLoggMelding(
+            AktivitetsloggMelding(
                 mapOf(
                     "hendelse" to mapOf(
                         "type" to personHendelse.toSpesifikkKontekst().kontekstType,
@@ -22,7 +22,7 @@ class AktivitetsloggEventMapper {
             )
         )
     }
-    data class AktivitetsLoggMelding(val innhold: Map<String, Any>) {
+    data class AktivitetsloggMelding(val innhold: Map<String, Any>) {
         val eventNavn: String = "aktivitetslogg"
     }
 }
