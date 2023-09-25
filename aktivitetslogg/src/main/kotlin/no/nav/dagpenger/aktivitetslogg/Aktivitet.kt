@@ -211,29 +211,4 @@ sealed class Aktivitet(
             visitor.visitWarn(id, kontekster, this, melding, tidsstempel)
         }
     }
-
-    class Audit private constructor(
-        id: UUID,
-        private val melding: String,
-        kontekster: List<SpesifikkKontekst>,
-        private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
-    ) :
-        Aktivitet(id, 0, 'A', melding, tidsstempel, kontekster) {
-        init {
-            require(
-                kontekster.any { it.kontekstType == AuditKontekst.kontekstType }
-            ) { "Audit melding må ha en kontekst av type AuditKontekst" }
-        }
-
-        override fun accept(visitor: AktivitetsloggVisitor) {
-            visitor.visitAudit(id, kontekster, this, melding, tidsstempel)
-        }
-
-        companion object {
-            fun opprett(kontekster: List<SpesifikkKontekst>, melding: String): Aktivitet {
-                return Audit(UUID.randomUUID(), melding, kontekster)
-            }
-        }
-    }
-
 }

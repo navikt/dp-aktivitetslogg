@@ -1,23 +1,20 @@
 package no.nav.dagpenger.aktivitetslogg
 
-
 interface IAktivitetslogg {
-    fun info(melding: String, vararg params: Any?)
+    fun info(melding: String)
+    fun info(melding: String, borgerIdent: String, saksbehandlerNavIdent: String, operasjon: AuditOperasjon)
     fun behov(type: Aktivitet.Behov.Behovtype, melding: String, detaljer: Map<String, Any> = emptyMap())
     fun varsel(melding: String)
+    fun varsel(melding: String, borgerIdent: String, saksbehandlerNavIdent: String, operasjon: AuditOperasjon)
     fun varsel(kode: Varselkode)
 
-    /**
-     * @param melding En menneskelesbar beskrivelse av hendelsen, tanken er at "average joe" må kunne forstå hva som skjedde
-     */
-    fun audit(melding: String)
     fun funksjonellFeil(kode: Varselkode)
-    fun logiskFeil(melding: String, vararg params: Any?): Nothing
 
+    fun logiskFeil(melding: String, vararg params: Any?): Nothing
     fun harAktiviteter(): Boolean
     fun harVarslerEllerVerre(): Boolean
-    fun harFunksjonelleFeilEllerVerre(): Boolean
 
+    fun harFunksjonelleFeilEllerVerre(): Boolean
     fun aktivitetsteller(): Int
     fun behov(): List<Aktivitet.Behov>
     fun barn(): IAktivitetslogg

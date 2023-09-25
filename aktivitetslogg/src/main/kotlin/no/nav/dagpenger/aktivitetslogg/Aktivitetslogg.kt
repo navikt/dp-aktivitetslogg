@@ -8,13 +8,32 @@ import no.nav.dagpenger.aktivitetslogg.Aktivitet.Behov
 class Aktivitetslogg(
     private var forelder: Aktivitetslogg? = null,
     private val aktiviteter: MutableList<Aktivitet> = mutableListOf(),
-    ) : IAktivitetslogg {
+) : IAktivitetslogg {
     private val kontekster = mutableListOf<Aktivitetskontekst>()
     private val observers = mutableListOf<AktivitetsloggObserver>()
 
-    override fun info(melding: String, vararg params: Any?) {
-        val formatertMelding = if (params.isEmpty()) melding else String.format(melding, *params)
-        add(Aktivitet.Info.opprett(kontekster.toSpesifikk(), formatertMelding))
+    override fun info(melding: String) {
+        add(Aktivitet.Info.opprett(kontekster.toSpesifikk(), melding))
+    }
+
+    override fun info(
+        melding: String,
+        borgerIdent: String,
+        saksbehandlerNavIdent: String,
+        operasjon: AuditOperasjon,
+    ) {
+        val kontekst = AuditKontekst(borgerIdent, saksbehandlerNavIdent, AuditKontekst.Alvorlighetsgrad.INFO, operasjon)
+        add(Aktivitet.Info.opprett((kontekster + kontekst).toSpesifikk(), melding))
+    }
+
+    override fun varsel(
+        melding: String,
+        borgerIdent: String,
+        saksbehandlerNavIdent: String,
+        operasjon: AuditOperasjon,
+    ) {
+        val kontekst = AuditKontekst(borgerIdent, saksbehandlerNavIdent, AuditKontekst.Alvorlighetsgrad.WARN, operasjon)
+        add(Aktivitet.Varsel.opprett((kontekster + kontekst).toSpesifikk(), melding = melding))
     }
 
     override fun behov(type: Behov.Behovtype, melding: String, detaljer: Map<String, Any>) {
@@ -24,12 +43,9 @@ class Aktivitetslogg(
     override fun varsel(melding: String) {
         add(Aktivitet.Varsel.opprett(kontekster.toSpesifikk(), melding = melding))
     }
+
     override fun varsel(kode: Varselkode) {
         add(kode.varsel(kontekster.toSpesifikk()))
-    }
-
-    override fun audit(melding: String) {
-        add(Aktivitet.Audit.opprett(kontekster.toSpesifikk(), melding = melding))
     }
 
     override fun funksjonellFeil(kode: Varselkode) {
@@ -60,7 +76,7 @@ class Aktivitetslogg(
         forelder?.add(aktivitet)
     }
 
-    private fun MutableList<Aktivitetskontekst>.toSpesifikk() = this.map { it.toSpesifikkKontekst() }
+    private fun List<Aktivitetskontekst>.toSpesifikk() = this.map { it.toSpesifikkKontekst() }
 
     override fun kontekst(kontekst: Aktivitetskontekst) {
         val spesifikkKontekst = kontekst.toSpesifikkKontekst()
@@ -132,7 +148,8 @@ class Aktivitetslogg(
     }
 
     companion object {
-        fun rehydrer(aktiviteter: List<Aktivitet>) = Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())
+        fun rehydrer(aktiviteter: List<Aktivitet>) =
+            Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())
     }
 }
 

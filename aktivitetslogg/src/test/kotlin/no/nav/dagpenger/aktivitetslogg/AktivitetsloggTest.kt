@@ -1,7 +1,5 @@
 package no.nav.dagpenger.aktivitetslogg
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.aktivitetslogg.serde.AktivitetsloggJsonBuilderTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -134,27 +132,19 @@ internal class AktivitetsloggTest {
         assertEquals(param2, aktivitetslogg.behov().first().detaljer()["param2"])
     }
 
-
     @Test
-    fun `audit aktivitet`() {
+    fun `det kan legges på AuditKontekst`() {
         val hendelse = TestHendelse("Hendelse", aktivitetslogg)
-        assertThrows<IllegalArgumentException> {
-            hendelse.audit(
-                melding = "sett på vedtak",
-            )
-        }
-        hendelse.kontekst(
-            AuditKontekst(
-                borgerIdent = "12345678901",
-                saksbehandlerNavIdent = "X123456",
-                alvorlighetsgrad = AuditKontekst.Alvorlighetsgrad.INFO,
-                operasjon = AuditKontekst.Operasjon.READ
-            )
-        )
-        hendelse.audit(
-            melding = "sett på vedtak",
-        )
-        assertAudit("sett på vedtak")
+
+        // API / mediator
+        hendelse.info("Heihei", "12345678901", "X123456", AuditOperasjon.READ)
+        assertInfo("Heihei")
+
+        hendelse.varsel("Neinei", "12345678901", "X123456", AuditOperasjon.READ)
+        assertVarsel("Neinei")
+
+        // I modellen
+        hendelse.info("Dette skjedde i modellen")
     }
 
     private fun assertLogiskfeil(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
@@ -177,15 +167,14 @@ internal class AktivitetsloggTest {
         assertTrue(visitorCalled)
     }
 
-    private fun assertAudit(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
+    private fun assertInfo(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
         var visitorCalled = false
         aktivitetslogg.accept(
             object : AktivitetsloggVisitor {
-
-                override fun visitAudit(
+                override fun visitInfo(
                     id: UUID,
                     kontekster: List<SpesifikkKontekst>,
-                    audit: Aktivitet.Audit,
+                    aktivitet: Aktivitet.Info,
                     melding: String,
                     tidsstempel: String,
                 ) {
@@ -197,14 +186,15 @@ internal class AktivitetsloggTest {
         assertTrue(visitorCalled)
     }
 
-    private fun assertInfo(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
+    private fun assertVarsel(message: String, aktivitetslogg: Aktivitetslogg = this.aktivitetslogg) {
         var visitorCalled = false
         aktivitetslogg.accept(
             object : AktivitetsloggVisitor {
-                override fun visitInfo(
+                override fun visitVarsel(
                     id: UUID,
                     kontekster: List<SpesifikkKontekst>,
-                    aktivitet: Aktivitet.Info,
+                    varsel: Aktivitet.Varsel,
+                    kode: Varselkode?,
                     melding: String,
                     tidsstempel: String,
                 ) {

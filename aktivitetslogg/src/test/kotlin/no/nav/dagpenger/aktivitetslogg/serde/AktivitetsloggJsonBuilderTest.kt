@@ -6,7 +6,7 @@ import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.assertions.throwables.shouldThrow
 import no.nav.dagpenger.aktivitetslogg.Aktivitet
 import no.nav.dagpenger.aktivitetslogg.Aktivitetslogg
-import no.nav.dagpenger.aktivitetslogg.AuditKontekst
+import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test
 
@@ -20,24 +20,14 @@ internal class AktivitetsloggJsonBuilderTest {
 
     @Test
     fun `json representasjon av aktitvitetslogg`() {
-
         aktivitetslogg.info("infomelding")
-        with(
-            AuditKontekst(
-                borgerIdent = "ceteros",
-                saksbehandlerNavIdent = "tation",
-                alvorlighetsgrad = AuditKontekst.Alvorlighetsgrad.INFO,
-                operasjon = AuditKontekst.Operasjon.CREATE
-
-            )
-        ) {
-            aktivitetslogg.kontekst(this)
-            aktivitetslogg.audit("auditmelding")
-        }
+        aktivitetslogg.info("auditmelding", "ceteros", "tation", AuditOperasjon.CREATE)
         aktivitetslogg.behov(
-            TestBehov, "behovmelding", mapOf(
-                "detalj" to "detaljert"
-            )
+            TestBehov,
+            "behovmelding",
+            mapOf(
+                "detalj" to "detaljert",
+            ),
         )
         aktivitetslogg.varsel("varselmelding")
         shouldThrow<Aktivitetslogg.AktivitetException> { aktivitetslogg.logiskFeil("logisk feil") }
@@ -49,8 +39,7 @@ internal class AktivitetsloggJsonBuilderTest {
     }
 
     //language=JSON
-    private fun expectedAktivitetsloggJson() = """
-    [
+    private fun expectedAktivitetsloggJson() = """[
   {
     "kontekster": [],
     "alvorlighetsgrad": "INFO",
@@ -70,22 +59,12 @@ internal class AktivitetsloggJsonBuilderTest {
         }
       }
     ],
-    "alvorlighetsgrad": "AUDIT",
+    "alvorlighetsgrad": "INFO",
     "melding": "auditmelding",
     "detaljer": {}
   },
   {
     "kontekster": [
-      {
-        "kontekstType": "audit",
-        "kontekstMap": {
-          "appName": "dagpenger-aktivitetslogg-ukjent",
-          "borgerIdent": "ceteros",
-          "saksbehandlerNavIdent": "tation",
-          "alvorlighetsgrad": "INFO",
-          "operasjon": "CREATE"
-        }
-      }
     ],
     "alvorlighetsgrad": "BEHOV",
     "behovtype": "TEST_BEHOV",
@@ -96,33 +75,13 @@ internal class AktivitetsloggJsonBuilderTest {
   },
   {
     "kontekster": [
-      {
-        "kontekstType": "audit",
-        "kontekstMap": {
-          "appName": "dagpenger-aktivitetslogg-ukjent",
-          "borgerIdent": "ceteros",
-          "saksbehandlerNavIdent": "tation",
-          "alvorlighetsgrad": "INFO",
-          "operasjon": "CREATE"
-        }
-      }
     ],
     "alvorlighetsgrad": "ERROR",
     "melding": "varselmelding",
     "detaljer": {}
   },
-    {
+  {
     "kontekster": [
-      {
-        "kontekstType": "audit",
-        "kontekstMap": {
-          "appName": "dagpenger-aktivitetslogg-ukjent",
-          "borgerIdent": "ceteros",
-          "saksbehandlerNavIdent": "tation",
-          "alvorlighetsgrad": "INFO",
-          "operasjon": "CREATE"
-        }
-      }
     ],
     "alvorlighetsgrad": "WARN",
     "melding": "logisk feil",
@@ -131,13 +90,10 @@ internal class AktivitetsloggJsonBuilderTest {
 ]
 """
 
-
     object TestBehov : Aktivitet.Behov.Behovtype {
         override val name: String
             get() = "TEST_BEHOV"
-
     }
-
 
     private fun Aktivitetslogg.asJson() = jsonMapper.writeValueAsString(AktivitetsloggJsonBuilder(this).asList())
 

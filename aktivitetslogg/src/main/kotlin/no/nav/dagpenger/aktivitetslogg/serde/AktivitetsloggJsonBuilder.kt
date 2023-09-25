@@ -88,16 +88,6 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         leggTilAktivitet(id, kontekster, Alvorlighetsgrad.SEVERE, melding, tidsstempel)
     }
 
-    override fun visitAudit(
-        id: UUID,
-        kontekster: List<SpesifikkKontekst>,
-        audit: Aktivitet.Audit,
-        melding: String,
-        tidsstempel: String
-    ) {
-        leggTilAktivitet(id, kontekster, Alvorlighetsgrad.AUDIT, melding, tidsstempel)
-    }
-
     private fun leggTilAktivitet(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,

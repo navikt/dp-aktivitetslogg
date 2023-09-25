@@ -2,7 +2,6 @@ package no.nav.dagpenger.aktivitetslogg
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class AuditKontekstTest {
 
@@ -12,7 +11,7 @@ class AuditKontekstTest {
             borgerIdent = "audit",
             saksbehandlerNavIdent = "diam",
             alvorlighetsgrad = AuditKontekst.Alvorlighetsgrad.INFO,
-            operasjon = AuditKontekst.Operasjon.READ
+            operasjon = AuditOperasjon.READ,
         )
 
         val spesifikkKontekst = auditKontekst.toSpesifikkKontekst()
@@ -23,7 +22,7 @@ class AuditKontekstTest {
             "borgerIdent" to "audit",
             "saksbehandlerNavIdent" to "diam",
             "alvorlighetsgrad" to "INFO",
-            "operasjon" to "READ"
+            "operasjon" to "READ",
         )
     }
 }

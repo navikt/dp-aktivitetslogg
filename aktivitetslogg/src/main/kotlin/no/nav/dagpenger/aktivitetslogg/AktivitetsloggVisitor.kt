@@ -55,12 +55,4 @@ interface AktivitetsloggVisitor {
         tidsstempel: String,
     ) {
     }
-
-    fun visitAudit(
-        id: UUID,
-        kontekster: List<SpesifikkKontekst>,
-        audit: Aktivitet.Audit,
-        melding: String,
-        tidsstempel: String
-    ) {}
 }

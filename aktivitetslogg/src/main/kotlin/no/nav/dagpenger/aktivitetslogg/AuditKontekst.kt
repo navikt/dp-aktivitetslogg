@@ -1,5 +1,12 @@
 package no.nav.dagpenger.aktivitetslogg
 
+enum class AuditOperasjon {
+    CREATE,
+    READ,
+    UPDATE,
+    DELETE,
+}
+
 /**
  * @constructor
  * @param borgerIdent Fødselsnummer på borgeren
@@ -7,20 +14,13 @@ package no.nav.dagpenger.aktivitetslogg
  * @param alvorlighetsgrad Alvorlighetsgraden av hendelsen: INFO, WARN
  * @param operasjon Hvilken operasjon som ble utført: CREATE, READ, UPDATE, DELETE
  */
-class AuditKontekst(
+internal class AuditKontekst(
     private val borgerIdent: String,
     private val saksbehandlerNavIdent: String,
     private val alvorlighetsgrad: Alvorlighetsgrad,
-    private val operasjon: Operasjon
+    private val operasjon: AuditOperasjon,
 ) : Aktivitetskontekst {
-
     private val appNavn: String = System.getenv("NAIS_APP_NAME") ?: "dagpenger-aktivitetslogg-ukjent"
-    enum class Operasjon {
-        CREATE,
-        READ,
-        UPDATE,
-        DELETE,
-    }
 
     enum class Alvorlighetsgrad {
         INFO,
@@ -36,7 +36,7 @@ class AuditKontekst(
                 "saksbehandlerNavIdent" to saksbehandlerNavIdent,
                 "alvorlighetsgrad" to alvorlighetsgrad.name,
                 "operasjon" to operasjon.name,
-            )
+            ),
         )
     }
 
