@@ -6,12 +6,12 @@ plugins {
     `java-library`
 }
 
+
 repositories {
     mavenCentral()
 }
 
 group = "no.nav.dagpenger"
-//version = "1.0"
 
 dependencies {
     implementation(libs.bundles.jackson)
@@ -26,10 +26,20 @@ tasks {
     }
 }
 
+val sourcesJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").allSource)
+}
+
+tasks.named("build") {
+    dependsOn("sourcesJar")
+}
+
 publishing {
     publications {
         create<MavenPublication>("name") {
             from(components["java"])
+            artifact(sourcesJar)
         }
     }
     repositories {
