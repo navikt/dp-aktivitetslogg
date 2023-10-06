@@ -18,8 +18,8 @@ dependencies {
     implementation(libs.bundles.ktor.server)
 
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
-    implementation("io.ktor:ktor-serialization-jackson:2.3.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
+    implementation("io.ktor:ktor-serialization-jackson:2.3.5")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.ktor.client)
