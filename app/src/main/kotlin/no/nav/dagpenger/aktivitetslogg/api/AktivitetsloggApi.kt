@@ -35,7 +35,7 @@ import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger {}
-private val sikkerLogger = KotlinLogging.logger("tjenestkall")
+private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 
 internal fun Application.aktivitetsloggApi(
     aktivitetsloggRepository: AktivitetsloggRepository,

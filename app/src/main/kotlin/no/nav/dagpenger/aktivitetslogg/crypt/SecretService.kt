@@ -11,7 +11,7 @@ import javax.crypto.Cipher
 
 class SecretService {
 
-    private val sikkerLogger = KotlinLogging.logger("tjenestkall")
+    private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     private val keyPair: KeyPair
 
     init {
