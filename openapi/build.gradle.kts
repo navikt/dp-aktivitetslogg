@@ -1,6 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
-    id("org.openapi.generator") version "7.0.1"
+    id("org.openapi.generator") version "7.2.0"
     `java-library`
 }
 
