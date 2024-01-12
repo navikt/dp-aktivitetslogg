@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -59,6 +60,7 @@ internal class PostgresAktivitetsloggRepository(
 
     private fun aktivitetsloggDTO(json: String) = jacksonObjectMapper.readValue<AktivitetsloggDTO>(json)
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun lagre(uuid: UUID, ident: String, json: String) = using(sessionOf(ds)) { session ->
         session.run(
             queryOf(

@@ -18,14 +18,14 @@ dependencies {
     implementation(libs.bundles.ktor.server)
 
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-jackson:2.3.7")
+    implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-serialization-jackson:${libs.versions.ktor.get()}")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.ktor.client)
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.bundles.kotest.assertions)
-    testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.7")
+    testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.mock.oauth2.server)
 }
 
@@ -51,7 +51,7 @@ tasks {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 

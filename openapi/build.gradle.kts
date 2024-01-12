@@ -15,7 +15,7 @@ tasks.named("compileKotlin").configure {
 sourceSets {
     main {
         java {
-            setSrcDirs(listOf("$buildDir/generated/src/main/kotlin"))
+            setSrcDirs(listOf("${layout.buildDirectory.get()}/generated/src/main/kotlin"))
         }
     }
 }
@@ -27,7 +27,7 @@ dependencies {
 openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set("$projectDir/src/main/resources/aktivitetslogg-api.yaml")
-    outputDir.set("$buildDir/generated/")
+    outputDir.set("${layout.buildDirectory.get()}/generated/")
     packageName.set("no.nav.dagpenger.aktivitetslogg.api")
     globalProperties.set(
         mapOf(

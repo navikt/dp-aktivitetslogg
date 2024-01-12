@@ -2,6 +2,7 @@ package no.nav.dagpenger.aktivitetslogg.api.auth
 
 import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
+import java.net.URI
 import java.net.URL
 
 fun JWTAuthenticationProvider.Config.verifier(type: NaisJWTProviders) {
@@ -14,7 +15,7 @@ abstract class NaisJWTProviders private constructor(
     private val clientId: String,
 ) {
     constructor(jwksUri: String, issuer: String, clientId: String) : this(
-        jwksUri = URL(getEnvOrSystem(jwksUri)),
+        jwksUri = URI(getEnvOrSystem(jwksUri)).toURL(),
         issuer = getEnvOrSystem(issuer),
         clientId = getEnvOrSystem(clientId),
     )
