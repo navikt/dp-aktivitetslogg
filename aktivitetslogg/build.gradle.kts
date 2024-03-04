@@ -30,20 +30,10 @@ tasks {
     }
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets.getByName("main").allSource)
-}
-
-tasks.named("build") {
-    dependsOn("sourcesJar")
-}
-
 publishing {
     publications {
         create<MavenPublication>("name") {
             from(components["java"])
-            artifact(sourcesJar)
         }
     }
     repositories {
