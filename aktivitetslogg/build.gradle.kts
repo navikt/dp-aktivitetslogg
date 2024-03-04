@@ -11,6 +11,10 @@ repositories {
     mavenCentral()
 }
 
+java {
+    withSourcesJar()
+}
+
 group = "no.nav.dagpenger"
 
 dependencies {

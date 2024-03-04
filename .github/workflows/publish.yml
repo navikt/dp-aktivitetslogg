@@ -12,6 +12,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: "write" # For å submitte dependency graph
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,7 +60,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17.x
+          java-version: 21.x
           cache: 'gradle'
       - name: publish
         run: ./gradlew -Pversion="$(echo ${{ needs.release.outputs.tag }})" publish
