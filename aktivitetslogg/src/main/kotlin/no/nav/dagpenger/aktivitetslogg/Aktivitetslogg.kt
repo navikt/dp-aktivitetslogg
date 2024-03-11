@@ -1,6 +1,12 @@
 package no.nav.dagpenger.aktivitetslogg
 
-import no.nav.dagpenger.aktivitetslogg.Aktivitet.Behov
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Aktivitet
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
+import no.nav.dagpenger.aktivitetslogg.aktivitet.FunksjonellFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Hendelse
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Info
+import no.nav.dagpenger.aktivitetslogg.aktivitet.LogiskFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Varsel
 
 // Understands issues that arose when analyzing a JSON message
 // Implements Collecting Parameter in Refactoring by Martin Fowler
@@ -13,7 +19,7 @@ class Aktivitetslogg(
     private val observers = mutableListOf<AktivitetsloggObserver>()
 
     override fun info(melding: String) {
-        add(Aktivitet.Info.opprett(kontekster.toSpesifikk(), melding))
+        add(Info.opprett(kontekster.toSpesifikk(), melding))
     }
 
     override fun info(
@@ -23,7 +29,15 @@ class Aktivitetslogg(
         operasjon: AuditOperasjon,
     ) {
         val kontekst = AuditKontekst(borgerIdent, saksbehandlerNavIdent, AuditKontekst.Alvorlighetsgrad.INFO, operasjon)
-        add(Aktivitet.Info.opprett((kontekster + kontekst).toSpesifikk(), melding))
+        add(Info.opprett((kontekster + kontekst).toSpesifikk(), melding))
+    }
+
+    override fun hendelse(
+        type: Hendelse.Hendelsetype,
+        melding: String,
+        detaljer: Map<String, Any>,
+    ) {
+        add(Hendelse.opprett(type, kontekster.toSpesifikk(), melding, detaljer))
     }
 
     override fun varsel(
@@ -33,19 +47,23 @@ class Aktivitetslogg(
         operasjon: AuditOperasjon,
     ) {
         val kontekst = AuditKontekst(borgerIdent, saksbehandlerNavIdent, AuditKontekst.Alvorlighetsgrad.WARN, operasjon)
-        add(Aktivitet.Varsel.opprett((kontekster + kontekst).toSpesifikk(), melding = melding))
-    }
-
-    override fun behov(type: Behov.Behovtype, melding: String, detaljer: Map<String, Any>) {
-        add(Behov.opprett(type, kontekster.toSpesifikk(), melding, detaljer))
+        add(Varsel.opprett((kontekster + kontekst).toSpesifikk(), melding = melding))
     }
 
     override fun varsel(melding: String) {
-        add(Aktivitet.Varsel.opprett(kontekster.toSpesifikk(), melding = melding))
+        add(Varsel.opprett(kontekster.toSpesifikk(), melding = melding))
     }
 
     override fun varsel(kode: Varselkode) {
         add(kode.varsel(kontekster.toSpesifikk()))
+    }
+
+    override fun behov(
+        type: Behov.Behovtype,
+        melding: String,
+        detaljer: Map<String, Any>,
+    ) {
+        add(Behov.opprett(type, kontekster.toSpesifikk(), melding, detaljer))
     }
 
     override fun funksjonellFeil(kode: Varselkode) {
@@ -53,8 +71,11 @@ class Aktivitetslogg(
         // add(kode.funksjonellFeil(kontekster.toSpesifikk()))
     }
 
-    override fun logiskFeil(melding: String, vararg params: Any?): Nothing {
-        add(Aktivitet.LogiskFeil.opprett(kontekster.toSpesifikk(), String.format(melding, *params)))
+    override fun logiskFeil(
+        melding: String,
+        vararg params: Any?,
+    ): Nothing {
+        add(LogiskFeil.opprett(kontekster.toSpesifikk(), String.format(melding, *params)))
 
         throw AktivitetException(this)
     }
@@ -62,6 +83,7 @@ class Aktivitetslogg(
     override fun harAktiviteter() = info().isNotEmpty() || behov().isNotEmpty()
 
     override fun harVarslerEllerVerre() = varsel().isNotEmpty() || harFunksjonelleFeilEllerVerre()
+
     override fun harFunksjonelleFeilEllerVerre() = funksjonelleFeil().isNotEmpty() || logiskFeil().isNotEmpty()
 
     override fun aktivitetsteller() = aktiviteter.size
@@ -117,12 +139,18 @@ class Aktivitetslogg(
         }
     }
 
-    private fun info() = Aktivitet.Info.filter(aktiviteter)
-    fun varsel() = Aktivitet.Varsel.filter(aktiviteter)
+    private fun info() = Info.filter(aktiviteter)
 
-    private fun funksjonelleFeil() = Aktivitet.FunksjonellFeil.filter(aktiviteter)
-    private fun logiskFeil() = Aktivitet.LogiskFeil.filter(aktiviteter)
+    fun varsel() = Varsel.filter(aktiviteter)
+
+    private fun funksjonelleFeil() = FunksjonellFeil.filter(aktiviteter)
+
+    private fun logiskFeil() = LogiskFeil.filter(aktiviteter)
+
     override fun behov() = Behov.filter(aktiviteter)
+
+    override fun hendelse() = Hendelse.filter(aktiviteter)
+
     override fun kontekster() =
         aktiviteter
             .groupBy { it.kontekst(null) }
@@ -140,16 +168,16 @@ class Aktivitetslogg(
 
     class AktivitetException internal constructor(private val aktivitetslogg: Aktivitetslogg) :
         RuntimeException(aktivitetslogg.toString()) {
-        fun kontekst() = aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
-            result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
+            fun kontekst() =
+                aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
+                    result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
+                }
+
+            fun aktivitetslogg() = aktivitetslogg
         }
 
-        fun aktivitetslogg() = aktivitetslogg
-    }
-
     companion object {
-        fun rehydrer(aktiviteter: List<Aktivitet>) =
-            Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())
+        fun rehydrer(aktiviteter: List<Aktivitet>) = Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())
     }
 }
 

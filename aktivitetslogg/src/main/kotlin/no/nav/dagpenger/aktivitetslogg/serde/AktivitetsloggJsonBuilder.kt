@@ -1,10 +1,15 @@
 package no.nav.dagpenger.aktivitetslogg.serde
 
-import no.nav.dagpenger.aktivitetslogg.Aktivitet
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggVisitor
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import no.nav.dagpenger.aktivitetslogg.Varselkode
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
+import no.nav.dagpenger.aktivitetslogg.aktivitet.FunksjonellFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Hendelse
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Info
+import no.nav.dagpenger.aktivitetslogg.aktivitet.LogiskFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Varsel
 import java.util.UUID
 
 class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : AktivitetsloggVisitor {
@@ -20,6 +25,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
 
     private enum class Alvorlighetsgrad {
         INFO,
+        HENDELSE,
         WARN,
         BEHOV,
         ERROR,
@@ -30,17 +36,37 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     override fun visitInfo(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.Info,
+        aktivitet: Info,
         melding: String,
         tidsstempel: String,
     ) {
         leggTilAktivitet(id, kontekster, Alvorlighetsgrad.INFO, melding, tidsstempel)
     }
 
+    override fun visitHendelse(
+        id: UUID,
+        kontekster: List<SpesifikkKontekst>,
+        aktivitet: Hendelse,
+        type: Hendelse.Hendelsetype,
+        melding: String,
+        detaljer: Map<String, Any?>,
+        tidsstempel: String,
+    ) {
+        leggTilHendelse(
+            id,
+            kontekster,
+            Alvorlighetsgrad.HENDELSE,
+            type,
+            melding,
+            detaljer,
+            tidsstempel,
+        )
+    }
+
     override fun visitWarn(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.LogiskFeil,
+        aktivitet: LogiskFeil,
         melding: String,
         tidsstempel: String,
     ) {
@@ -50,8 +76,8 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     override fun visitBehov(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.Behov,
-        type: Aktivitet.Behov.Behovtype,
+        aktivitet: Behov,
+        type: Behov.Behovtype,
         melding: String,
         detaljer: Map<String, Any?>,
         tidsstempel: String,
@@ -70,7 +96,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     override fun visitVarsel(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        varsel: Aktivitet.Varsel,
+        varsel: Varsel,
         kode: Varselkode?,
         melding: String,
         tidsstempel: String,
@@ -81,7 +107,7 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
     override fun visitFunksjonellFeil(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        funksjonellFeil: Aktivitet.FunksjonellFeil,
+        funksjonellFeil: FunksjonellFeil,
         melding: String,
         tidsstempel: String,
     ) {
@@ -107,11 +133,33 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         )
     }
 
+    private fun leggTilHendelse(
+        id: UUID,
+        kontekster: List<SpesifikkKontekst>,
+        alvorlighetsgrad: Alvorlighetsgrad,
+        type: Hendelse.Hendelsetype,
+        melding: String,
+        detaljer: Map<String, Any?>,
+        tidsstempel: String,
+    ) {
+        aktiviteter.add(
+            mutableMapOf(
+                "id" to id,
+                "kontekster" to map(kontekster),
+                "alvorlighetsgrad" to alvorlighetsgrad.name,
+                "hendelsetype" to type.name,
+                "melding" to melding,
+                "detaljer" to detaljer,
+                "tidsstempel" to tidsstempel,
+            ),
+        )
+    }
+
     private fun leggTilBehov(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
         alvorlighetsgrad: Alvorlighetsgrad,
-        type: Aktivitet.Behov.Behovtype,
+        type: Behov.Behovtype,
         melding: String,
         detaljer: Map<String, Any?>,
         tidsstempel: String,
@@ -129,10 +177,11 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         )
     }
 
-    private fun map(kontekster: List<SpesifikkKontekst>) = kontekster.map {
-        mutableMapOf(
-            "kontekstType" to it.kontekstType,
-            "kontekstMap" to it.kontekstMap,
-        )
-    }
+    private fun map(kontekster: List<SpesifikkKontekst>) =
+        kontekster.map {
+            mutableMapOf(
+                "kontekstType" to it.kontekstType,
+                "kontekstMap" to it.kontekstMap,
+            )
+        }
 }

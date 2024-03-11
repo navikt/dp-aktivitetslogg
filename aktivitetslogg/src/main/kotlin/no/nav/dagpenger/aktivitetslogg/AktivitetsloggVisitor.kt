@@ -1,5 +1,11 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
+import no.nav.dagpenger.aktivitetslogg.aktivitet.FunksjonellFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Hendelse
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Info
+import no.nav.dagpenger.aktivitetslogg.aktivitet.LogiskFeil
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Varsel
 import java.util.UUID
 
 // Visitor for å besøke en aktivitetslogg.
@@ -7,10 +13,11 @@ import java.util.UUID
 // https://refactoring.guru/design-patterns/visitor
 interface AktivitetsloggVisitor {
     fun preVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
+
     fun visitInfo(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.Info,
+        aktivitet: Info,
         melding: String,
         tidsstempel: String,
     ) {
@@ -19,8 +26,19 @@ interface AktivitetsloggVisitor {
     fun visitWarn(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.LogiskFeil,
+        aktivitet: LogiskFeil,
         melding: String,
+        tidsstempel: String,
+    ) {
+    }
+
+    fun visitHendelse(
+        id: UUID,
+        kontekster: List<SpesifikkKontekst>,
+        aktivitet: Hendelse,
+        type: Hendelse.Hendelsetype,
+        melding: String,
+        detaljer: Map<String, Any?>,
         tidsstempel: String,
     ) {
     }
@@ -28,19 +46,18 @@ interface AktivitetsloggVisitor {
     fun visitBehov(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        aktivitet: Aktivitet.Behov,
-        type: Aktivitet.Behov.Behovtype,
+        aktivitet: Behov,
+        type: Behov.Behovtype,
         melding: String,
         detaljer: Map<String, Any?>,
         tidsstempel: String,
     ) {
     }
 
-    fun postVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
     fun visitVarsel(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        varsel: Aktivitet.Varsel,
+        varsel: Varsel,
         kode: Varselkode?,
         melding: String,
         tidsstempel: String,
@@ -50,9 +67,11 @@ interface AktivitetsloggVisitor {
     fun visitFunksjonellFeil(
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
-        funksjonellFeil: Aktivitet.FunksjonellFeil,
+        funksjonellFeil: FunksjonellFeil,
         melding: String,
         tidsstempel: String,
     ) {
     }
+
+    fun postVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
 }

@@ -1,8 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg
 
 data class SpesifikkKontekst(val kontekstType: String, val kontekstMap: Map<String, String> = mapOf()) {
-    fun melding() =
-        kontekstType + kontekstMap.entries.joinToString(separator = "") { " ${it.key}: ${it.value}" }
+    fun melding() = kontekstType + kontekstMap.entries.joinToString(separator = "") { " ${it.key}: ${it.value}" }
 
     fun sammeType(other: Aktivitetskontekst) = this.kontekstType == other.toSpesifikkKontekst().kontekstType
 
@@ -14,16 +13,7 @@ data class SpesifikkKontekst(val kontekstType: String, val kontekstMap: Map<Stri
     }
 
     override fun equals(other: Any?) =
-        this === other ||
-            (
-                other is SpesifikkKontekst &&
-                    this.kontekstMap == other.kontekstMap &&
-                    this.kontekstType == other.kontekstType
-                )
+        this === other || (other is SpesifikkKontekst && this.kontekstMap == other.kontekstMap && this.kontekstType == other.kontekstType)
 
-    override fun hashCode(): Int {
-        var result = kontekstType.hashCode()
-        result = 31 * result + kontekstMap.hashCode()
-        return result
-    }
+    override fun hashCode() = 31 * kontekstType.hashCode() + kontekstMap.hashCode()
 }

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.assertions.throwables.shouldThrow
-import no.nav.dagpenger.aktivitetslogg.Aktivitet
 import no.nav.dagpenger.aktivitetslogg.Aktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test
 
@@ -39,7 +39,8 @@ internal class AktivitetsloggJsonBuilderTest {
     }
 
     //language=JSON
-    private fun expectedAktivitetsloggJson() = """[
+    private fun expectedAktivitetsloggJson() =
+        """[
   {
     "kontekster": [],
     "alvorlighetsgrad": "INFO",
@@ -90,7 +91,7 @@ internal class AktivitetsloggJsonBuilderTest {
 ]
 """
 
-    object TestBehov : Aktivitet.Behov.Behovtype {
+    object TestBehov : Behov.Behovtype {
         override val name: String
             get() = "TEST_BEHOV"
     }

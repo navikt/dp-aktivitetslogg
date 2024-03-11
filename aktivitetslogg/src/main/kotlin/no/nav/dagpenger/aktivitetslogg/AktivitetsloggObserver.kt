@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import no.nav.dagpenger.aktivitetslogg.aktivitet.Hendelse
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -13,15 +14,28 @@ interface AktivitetsloggObserver {
         melding: String,
         kontekster: List<SpesifikkKontekst>,
         tidsstempel: LocalDateTime,
-    ) {}
+    ) {
+    }
+
+    fun hendelse(
+        id: UUID,
+        label: Char,
+        type: Hendelse.Hendelsetype,
+        melding: String,
+        kontekster: List<SpesifikkKontekst>,
+        tidsstempel: LocalDateTime,
+    ) {
+    }
+
     fun varsel(
         id: UUID,
         label: Char,
         kode: Varselkode?,
         melding: String,
         kontekster: List<SpesifikkKontekst>,
-        parse: LocalDateTime,
-    ) {}
+        tidsstempel: LocalDateTime,
+    ) {
+    }
 
     fun funksjonellFeil(
         id: UUID,
@@ -30,5 +44,6 @@ interface AktivitetsloggObserver {
         melding: String,
         kontekster: List<SpesifikkKontekst>,
         tidsstempel: LocalDateTime,
-    ) {}
+    ) {
+    }
 }
