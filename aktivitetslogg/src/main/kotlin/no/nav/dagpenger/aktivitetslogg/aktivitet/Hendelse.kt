@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitet
 
+import no.nav.dagpenger.aktivitetslogg.AktivitetsloggObserver
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggVisitor
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
 import java.time.LocalDateTime
@@ -36,6 +37,10 @@ class Hendelse private constructor(
 
     override fun accept(visitor: AktivitetsloggVisitor) {
         visitor.visitHendelse(id, kontekster, this, type, melding, detaljer, tidsstempel)
+    }
+
+    override fun notify(observer: AktivitetsloggObserver) {
+        observer.hendelse(id, label, type, melding, kontekster, LocalDateTime.parse(tidsstempel, tidsstempelformat))
     }
 
     interface Hendelsetype {
