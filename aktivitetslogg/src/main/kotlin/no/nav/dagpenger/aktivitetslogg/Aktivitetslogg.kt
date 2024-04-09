@@ -80,7 +80,7 @@ class Aktivitetslogg(
         throw AktivitetException(this)
     }
 
-    override fun harAktiviteter() = info().isNotEmpty() || behov().isNotEmpty()
+    override fun harAktiviteter() = info().isNotEmpty() || behov().isNotEmpty() || hendelse().isNotEmpty()
 
     override fun harVarslerEllerVerre() = varsel().isNotEmpty() || harFunksjonelleFeilEllerVerre()
 
