@@ -1,5 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Info
 import no.nav.dagpenger.aktivitetslogg.aktivitet.LogiskFeil
@@ -155,6 +157,14 @@ internal class AktivitetsloggTest {
 
         // I modellen
         hendelse.info("Dette skjedde i modellen")
+    }
+
+    @Test
+    fun `varsel er en aktivitet`() {
+        val hendelse = TestHendelse("Hendelse", aktivitetslogg)
+        hendelse.varsel("Neinei", "12345678901", "X123456", AuditOperasjon.READ)
+        assertVarsel("Neinei")
+        aktivitetslogg.harAktiviteter() shouldBe true
     }
 
     private fun assertLogiskfeil(
