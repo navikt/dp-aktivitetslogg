@@ -1,16 +1,16 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.toUUID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.path
@@ -31,7 +31,6 @@ import no.nav.dagpenger.aktivitetslogg.crypt.toDecryptedStringOrNull
 import no.nav.dagpenger.aktivitetslogg.serialisering.configureJackson
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.dagpenger.aktivitetslogg.toStringOrNull
-import no.nav.helse.rapids_rivers.toUUID
 import org.slf4j.event.Level
 
 private val logger = KotlinLogging.logger {}
@@ -39,7 +38,7 @@ private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 
 internal fun Application.aktivitetsloggApi(
     aktivitetsloggRepository: AktivitetsloggRepository,
-    secretService: SecretService
+    secretService: SecretService,
 ) {
     install(CallLogging) {
         disableDefaultColors()
@@ -98,12 +97,14 @@ internal fun Application.aktivitetsloggApi(
                 }
                 get("antall") {
                     call.respond(
-                        HttpStatusCode.OK, aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0)
+                        HttpStatusCode.OK,
+                        aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0),
                     )
                 }
                 get("keys") {
                     call.respond(
-                        HttpStatusCode.OK, KeysDTO(public = secretService.publicKeyAsString())
+                        HttpStatusCode.OK,
+                        KeysDTO(public = secretService.publicKeyAsString()),
                     )
                 }
             }

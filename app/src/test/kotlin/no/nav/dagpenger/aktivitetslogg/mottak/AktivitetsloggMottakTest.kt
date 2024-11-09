@@ -1,11 +1,10 @@
 package no.nav.dagpenger.aktivitetslogg.mottak
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
-import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.util.UUID

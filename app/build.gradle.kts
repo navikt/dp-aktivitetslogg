@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 plugins {
     id("org.jetbrains.kotlin.jvm")
     application
@@ -27,6 +25,7 @@ dependencies {
     testImplementation(libs.bundles.kotest.assertions)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.mock.oauth2.server)
+    testImplementation(libs.rapids.and.rivers.test)
 }
 
 tasks {
