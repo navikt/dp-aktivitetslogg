@@ -16,9 +16,14 @@ internal class ApplicationBuilder(
     private val aktivitetsloggRepository = PostgresAktivitetsloggRepository(dataSource)
     private val secretService = SecretService()
     private val rapidsConnection: RapidsConnection =
-        RapidApplication.create(configuration) { engine, _ ->
-            engine.application.aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }
+        RapidApplication.create(
+            configuration,
+            builder = {
+                withKtorModule {
+                    aktivitetsloggApi(aktivitetsloggRepository, secretService)
+                }
+            },
+        )
 
     init {
         rapidsConnection.register(this)
