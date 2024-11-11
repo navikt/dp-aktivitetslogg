@@ -8,6 +8,7 @@ import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.aktivitetslogg.mottak.AktivitetsloggMottak
+import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.RapidApplication
 
 internal class ApplicationBuilder(
@@ -18,6 +19,7 @@ internal class ApplicationBuilder(
     private val rapidsConnection: RapidsConnection =
         RapidApplication.create(
             configuration,
+            objectMapper = jacksonObjectMapper,
             builder = {
                 withKtorModule {
                     aktivitetsloggApi(aktivitetsloggRepository, secretService)

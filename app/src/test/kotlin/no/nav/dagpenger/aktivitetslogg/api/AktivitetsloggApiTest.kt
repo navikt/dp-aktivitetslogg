@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -8,11 +9,13 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.utils.EmptyContent.status
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.ApplicationTestBuilder
-import io.ktor.server.testing.testApplication
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
@@ -24,9 +27,9 @@ import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.crypt.encrypt
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
+import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
-import java.net.URLEncoder
 import java.util.UUID
 
 class AktivitetsloggApiTest {
@@ -36,12 +39,13 @@ class AktivitetsloggApiTest {
     private val andre = UUID.randomUUID()
     private val tredje = UUID.randomUUID()
     private val fjerde = UUID.randomUUID()
-    private val aktivitetsloggRepository = PostgresAktivitetsloggRepository(withMigratedDb()).apply {
-        lagre(første, "1", getData(første, "1"))
-        lagre(andre, "2", getData(andre, "2"))
-        lagre(tredje, "3", getData(tredje, "3"))
-        lagre(fjerde, "3", getData(fjerde, "3"))
-    }
+    private val aktivitetsloggRepository =
+        PostgresAktivitetsloggRepository(withMigratedDb()).apply {
+            lagre(første, "1", getData(første, "1"))
+            lagre(andre, "2", getData(andre, "2"))
+            lagre(tredje, "3", getData(tredje, "3"))
+            lagre(fjerde, "3", getData(fjerde, "3"))
+        }
     private val secretService = SecretService()
 
     @Test
@@ -50,163 +54,184 @@ class AktivitetsloggApiTest {
     }
 
     @Test
-    fun `kan hente med since og limit`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg?since=$andre&limit=2") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-            response.size shouldBe 2
-
-            response[0].atId shouldBe fjerde.toString()
-            response[1].atId shouldBe tredje.toString()
-        }
-    }
-
-    @Test
-    fun `kan hente på ident`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-        val encryptedIdent = secretService.encrypt("3", secretService.publicKeyAsString())
-
-        client().get("/aktivitetslogg?ident=$encryptedIdent") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-
-            response.size shouldBe 2
-
-            response[0].ident shouldBe "3"
-            response[1].ident shouldBe "3"
-        }
-
-        client().get("/aktivitetslogg?ident=${secretService.encrypt("333", secretService.publicKeyAsString())}") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-
-            response.size shouldBe 0
-        }
-    }
-
-    @Test
-    fun `kan hente på tjeneste`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg?tjeneste=dp-vedtak") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-
-            response.size shouldBe 0
-        }
-
-        client().get("/aktivitetslogg?tjeneste=dp-rapportering") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-
-            response.size shouldBe 4
-
-            response[0].systemParticipatingServices[0].service shouldBe "dp-rapportering"
-        }
-    }
-
-    @Test
-    fun `kan hente uten argument`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<AktivitetsloggDTO>>()
-            response.size shouldBe 4
-
-            response[0].atId shouldBe fjerde.toString()
-            response[1].atId shouldBe tredje.toString()
-            response[2].atId shouldBe andre.toString()
-            response[3].atId shouldBe første.toString()
-        }
-    }
-
-    @Test
-    fun `kan vente på nye meldinger`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        val nyAktivitetslogg = UUID.randomUUID()
-        runBlocking {
-            async {
-                client().get("/aktivitetslogg?since=$fjerde&wait=true") {
+    fun `kan hente med since og limit`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg?since=$andre&limit=2") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
                 }.apply {
                     status shouldBe HttpStatusCode.OK
                     val response = this.body<List<AktivitetsloggDTO>>()
-                    response.size shouldBe 1
+                    response.size shouldBe 2
 
-                    response[0].atId shouldBe nyAktivitetslogg.toString()
+                    response[0].atId shouldBe fjerde.toString()
+                    response[1].atId shouldBe tredje.toString()
+                }
+        }
+
+    @Test
+    fun `kan hente på ident`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            val encryptedIdent = secretService.encrypt("3", secretService.publicKeyAsString())
+
+            client
+                .get("/aktivitetslogg?ident=$encryptedIdent") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+
+                    response.size shouldBe 2
+
+                    response[0].ident shouldBe "3"
+                    response[1].ident shouldBe "3"
+                }
+
+            client
+                .get("/aktivitetslogg?ident=${secretService.encrypt("333", secretService.publicKeyAsString())}") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+
+                    response.size shouldBe 0
+                }
+        }
+
+    @Test
+    fun `kan hente på tjeneste`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg?tjeneste=dp-vedtak") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+
+                    response.size shouldBe 0
+                }
+
+            client
+                .get("/aktivitetslogg?tjeneste=dp-rapportering") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+
+                    response.size shouldBe 4
+
+                    response[0].systemParticipatingServices[0].service shouldBe "dp-rapportering"
+                }
+        }
+
+    @Test
+    fun `kan hente uten argument`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<AktivitetsloggDTO>>()
+                    response.size shouldBe 4
+
+                    response[0].atId shouldBe fjerde.toString()
+                    response[1].atId shouldBe tredje.toString()
+                    response[2].atId shouldBe andre.toString()
+                    response[3].atId shouldBe første.toString()
+                }
+        }
+
+    @Test
+    fun `kan vente på nye meldinger`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            val nyAktivitetslogg = UUID.randomUUID()
+            runBlocking {
+                async {
+                    client
+                        .get("/aktivitetslogg?since=$fjerde&wait=true") {
+                            header(HttpHeaders.Authorization, "Bearer $testToken")
+                        }.apply {
+                            status shouldBe HttpStatusCode.OK
+                            val response = this.body<List<AktivitetsloggDTO>>()
+                            response.size shouldBe 1
+
+                            response[0].atId shouldBe nyAktivitetslogg.toString()
+                        }
+                }
+                async {
+                    aktivitetsloggRepository.lagre(nyAktivitetslogg, "1", getData(nyAktivitetslogg, "1"))
                 }
             }
-            async {
-                aktivitetsloggRepository.lagre(nyAktivitetslogg, "1", getData(nyAktivitetslogg, "1"))
+        }
+
+    @Test
+    fun `kan hente alle tjenester`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg/tjenester") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<List<TjenesteDTO>>()
+                    response.size shouldBe 2
+                }
+        }
+
+    @Test
+    fun `kan hente antall aktiviteter`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg/antall") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val antallAktiviteter = this.body<AntallAktiviteterDTO>()
+                    antallAktiviteter.antall shouldBe 4
+                }
+        }
+
+    @Test
+    fun `kan hente public key`() =
+        naisfulTestApp({
+            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+            client
+                .get("/aktivitetslogg/keys") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.apply {
+                    status shouldBe HttpStatusCode.OK
+                    val response = this.body<KeysDTO>()
+                    response.public shouldNotBe null
+                }
+        }
+
+    private fun ApplicationTestBuilder.client() =
+        createClient {
+            install(ContentNegotiation) {
+                jackson { registerModule(JavaTimeModule()) }
             }
         }
-    }
-
-    @Test
-    fun `kan hente alle tjenester`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg/tjenester") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<List<TjenesteDTO>>()
-            response.size shouldBe 2
-
-        }
-    }
-
-    @Test
-    fun `kan hente antall aktiviteter`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg/antall") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val antallAktiviteter = this.body<AntallAktiviteterDTO>()
-            antallAktiviteter.antall shouldBe 4
-        }
-    }
-
-    @Test
-    fun `kan hente public key`() = testApplication {
-        application { aktivitetsloggApi(aktivitetsloggRepository, secretService) }
-
-        client().get("/aktivitetslogg/keys") {
-            header(HttpHeaders.Authorization, "Bearer $testToken")
-        }.apply {
-            status shouldBe HttpStatusCode.OK
-            val response = this.body<KeysDTO>()
-            response.public shouldNotBe null
-        }
-
-    }
-
-    private fun ApplicationTestBuilder.client() = createClient {
-        install(ContentNegotiation) {
-            jackson { registerModule(JavaTimeModule()) }
-        }
-    }
 }
 
-fun getData(atId: UUID, ident: String) = """
+fun getData(
+    atId: UUID,
+    ident: String,
+) = """
 {
   "@id": "$atId",
   "ident": "$ident",
@@ -264,4 +289,4 @@ fun getData(atId: UUID, ident: String) = """
     }
   ]
 } 
-""".trimIndent()
+    """.trimIndent()
