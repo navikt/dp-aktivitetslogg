@@ -1,6 +1,11 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.Clock
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.aktivitetsloggApi
@@ -19,12 +24,28 @@ internal class ApplicationBuilder(
     private val rapidsConnection: RapidsConnection =
         RapidApplication.create(
             configuration,
-            objectMapper = jacksonObjectMapper,
             builder = {
-                withKtorModule {
-                    aktivitetsloggApi(aktivitetsloggRepository, secretService)
+                withKtor { preStopHook, rapid ->
+                    naisApp(
+                        meterRegistry =
+                            PrometheusMeterRegistry(
+                                PrometheusConfig.DEFAULT,
+                                PrometheusRegistry.defaultRegistry,
+                                Clock.SYSTEM,
+                            ),
+                        objectMapper = jacksonObjectMapper,
+                        applicationLogger = KotlinLogging.logger("ApplicationLogger"),
+                        callLogger = KotlinLogging.logger("CallLogger"),
+                        aliveCheck = rapid::isReady,
+                        readyCheck = rapid::isReady,
+                    ) {
+                        aktivitetsloggApi(
+                            aktivitetsloggRepository = aktivitetsloggRepository,
+                            secretService = secretService,
+                        )
+                    }
                 }
-            },
+            }
         )
 
     init {
