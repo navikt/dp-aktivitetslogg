@@ -12,7 +12,6 @@ import kotlin.test.Test
 
 internal class AktivitetsloggJsonBuilderTest {
     private lateinit var aktivitetslogg: Aktivitetslogg
-
     @BeforeEach
     fun setUp() {
         aktivitetslogg = Aktivitetslogg()
