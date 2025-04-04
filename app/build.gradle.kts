@@ -27,7 +27,7 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.04.02-15.56-d34332c4")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.04.04-09.18-7cc3badf")
     testImplementation(libs.mockk)
 }
 
