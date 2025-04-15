@@ -42,7 +42,7 @@ spec:
     pool: {{ kafka_pool }}
   gcp:
     sqlInstances:
-      - type: POSTGRES_15
+      - type: POSTGRES_17
         highAvailability: true
         diskAutoresize: true
         pointInTimeRecovery: true

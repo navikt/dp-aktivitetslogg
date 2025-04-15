@@ -7,7 +7,7 @@ import javax.sql.DataSource
 
 internal object Postgres {
     private val instance by lazy {
-        PostgreSQLContainer<Nothing>("postgres:15.2").apply {
+        PostgreSQLContainer<Nothing>("postgres:17.4").apply {
             start()
         }
     }
