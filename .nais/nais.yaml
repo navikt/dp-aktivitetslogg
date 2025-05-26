@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamdagpenger
 spec:
-  image: {{ image }}
+  image: "{{ image }}"
   port: 8080
   prometheus:
     enabled: true
@@ -39,14 +39,14 @@ spec:
     - name: FLYWAY_CLEAN_DISABLED
       value: "true"
   kafka:
-    pool: {{ kafka_pool }}
+    pool: "{{ kafka_pool }}"
   gcp:
     sqlInstances:
       - type: POSTGRES_17
         highAvailability: true
         diskAutoresize: true
         pointInTimeRecovery: true
-        tier: {{gcp.sql.tier}}
+        tier: "{{gcp.sql.tier}}"
         databases:
           - name: aktivitetslogg
             envVarPrefix: DB
