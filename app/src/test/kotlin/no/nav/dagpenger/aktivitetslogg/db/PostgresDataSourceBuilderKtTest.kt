@@ -11,6 +11,7 @@ class PostgresDataSourceBuilderKtTest {
 
         property.toSnakeCase() shouldBe "FLYWAY_CLEAN_DISABLED"
     }
+
     @Test
     fun `does not convert uppercased env-var`() {
         val property = "DB_HOST"

@@ -9,7 +9,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.utils.EmptyContent.status
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
@@ -25,15 +24,15 @@ import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.crypt.encrypt
+import no.nav.dagpenger.aktivitetslogg.helpers.MockAzure
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
-import no.nav.dagpenger.aktivitetslogg.helpers.mockAzure
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import java.util.UUID
 
 class AktivitetsloggApiTest {
-    private val testToken by mockAzure
+    private val testToken by MockAzure
 
     private val første = UUID.randomUUID()
     private val andre = UUID.randomUUID()
@@ -228,65 +227,66 @@ class AktivitetsloggApiTest {
         }
 }
 
+// language=JSON
 fun getData(
     atId: UUID,
     ident: String,
 ) = """
-{
-  "@id": "$atId",
-  "ident": "$ident",
-  "hendelse": {
-    "type": "BeregningsdatoPassertHendelse",
-    "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
-  },
-  "@opprettet": "2023-08-09T10:07:32.215009157",
-  "@event_name": "aktivitetslogg",
-  "aktiviteter": [
     {
-      "melding": "Rapporteringsperioden skal ikke beregnes på grunn av strategi",
-      "detaljer": {},
-      "kontekster": [
+      "@id": "$atId",
+      "ident": "$ident",
+      "hendelse": {
+        "type": "BeregningsdatoPassertHendelse",
+        "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
+      },
+      "@opprettet": "2023-08-09T10:07:32.215009157",
+      "@event_name": "aktivitetslogg",
+      "aktiviteter": [
         {
-          "kontekstMap": {
-            "ident": "$ident",
-            "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
-          },
-          "kontekstType": "BeregningsdatoPassertHendelse"
-        },
-        {
-          "kontekstMap": {
-            "fom": "2023-07-10",
-            "tom": "2023-07-23"
-          },
-          "kontekstType": "Rapporteringsperiode"
-        },
-        {
-          "kontekstMap": {
-            "tilstand": "Godkjent"
-          },
-          "kontekstType": "Tilstand"
+          "melding": "Rapporteringsperioden skal ikke beregnes på grunn av strategi",
+          "detaljer": {},
+          "kontekster": [
+            {
+              "kontekstMap": {
+                "ident": "$ident",
+                "meldingsreferanseId": "fdeb70cd-da1f-4f08-b508-58352811fcd5"
+              },
+              "kontekstType": "BeregningsdatoPassertHendelse"
+            },
+            {
+              "kontekstMap": {
+                "fom": "2023-07-10",
+                "tom": "2023-07-23"
+              },
+              "kontekstType": "Rapporteringsperiode"
+            },
+            {
+              "kontekstMap": {
+                "tilstand": "Godkjent"
+              },
+              "kontekstType": "Tilstand"
+            }
+          ],
+          "tidsstempel": "2023-08-09 10:07:32.119",
+          "alvorlighetsgrad": "INFO"
         }
       ],
-      "tidsstempel": "2023-08-09 10:07:32.119",
-      "alvorlighetsgrad": "INFO"
-    }
-  ],
-  "system_read_count": 1,
-  "system_participating_services": [
-    {
-      "id": "d70ece5f-6706-4e78-a23d-0218a23559c5",
-      "time": "2023-08-09T10:07:32.215009157",
-      "image": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-rapportering:2023.08.09-07.35-242c3a6",
-      "service": "dp-rapportering",
-      "instance": "dp-rapportering-8ccf6d78d-h4rrj"
-    },
-    {
-      "id": "d70ece5f-6706-4e78-a23d-0218a23559c5",
-      "time": "2023-08-09T08:07:32.221241183",
-      "image": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-aktivitetslogg:2023.08.09-07.49-8d442ef",
-      "service": "dp-aktivitetslogg",
-      "instance": "dp-aktivitetslogg-654ddd875b-psps7"
-    }
-  ]
-} 
+      "system_read_count": 1,
+      "system_participating_services": [
+        {
+          "id": "d70ece5f-6706-4e78-a23d-0218a23559c5",
+          "time": "2023-08-09T10:07:32.215009157",
+          "image": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-rapportering:2023.08.09-07.35-242c3a6",
+          "service": "dp-rapportering",
+          "instance": "dp-rapportering-8ccf6d78d-h4rrj"
+        },
+        {
+          "id": "d70ece5f-6706-4e78-a23d-0218a23559c5",
+          "time": "2023-08-09T08:07:32.221241183",
+          "image": "europe-north1-docker.pkg.dev/nais-management-233d/teamdagpenger/dp-aktivitetslogg:2023.08.09-07.49-8d442ef",
+          "service": "dp-aktivitetslogg",
+          "instance": "dp-aktivitetslogg-654ddd875b-psps7"
+        }
+      ]
+    } 
     """.trimIndent()

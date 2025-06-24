@@ -12,12 +12,12 @@ class LogiskFeil private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 100, 'S', melding, tidsstempel, kontekster) {
     companion object {
-        fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> {
-            return aktiviteter.filterIsInstance<LogiskFeil>()
-        }
+        fun filter(aktiviteter: List<Aktivitet>): List<LogiskFeil> = aktiviteter.filterIsInstance<LogiskFeil>()
 
-        fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
-            LogiskFeil(UUID.randomUUID(), kontekster, melding)
+        fun opprett(
+            kontekster: List<SpesifikkKontekst>,
+            melding: String,
+        ) = LogiskFeil(UUID.randomUUID(), kontekster, melding)
     }
 
     override fun accept(visitor: AktivitetsloggVisitor) {

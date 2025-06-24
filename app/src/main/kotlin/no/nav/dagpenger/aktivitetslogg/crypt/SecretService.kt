@@ -10,7 +10,6 @@ import java.util.Base64
 import javax.crypto.Cipher
 
 class SecretService {
-
     private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     private val keyPair: KeyPair
 
@@ -36,11 +35,10 @@ class SecretService {
 //            )
 //        )
 //    }
-
 }
 
-fun String.toDecryptedStringOrNull(privateKey: PrivateKey): String? {
-    return if (this == "null") {
+fun String.toDecryptedStringOrNull(privateKey: PrivateKey): String? =
+    if (this == "null") {
         null
     } else {
         val decryptCipher = Cipher.getInstance("RSA")
@@ -48,8 +46,7 @@ fun String.toDecryptedStringOrNull(privateKey: PrivateKey): String? {
 
         String(
             decryptCipher.doFinal(
-                Base64.getDecoder().decode(this.toByteArray(StandardCharsets.UTF_8))
-            )
+                Base64.getDecoder().decode(this.toByteArray(StandardCharsets.UTF_8)),
+            ),
         )
     }
-}

@@ -15,9 +15,7 @@ class Hendelse private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 10, 'H', melding, tidsstempel, kontekster) {
     companion object {
-        fun filter(aktiviteter: List<Aktivitet>): List<Hendelse> {
-            return aktiviteter.filterIsInstance<Hendelse>()
-        }
+        fun filter(aktiviteter: List<Aktivitet>): List<Hendelse> = aktiviteter.filterIsInstance<Hendelse>()
 
         fun opprett(
             type: Hendelsetype,

@@ -23,12 +23,14 @@ sealed class Aktivitet(
 
     fun kontekst(): Map<String, String> = kontekst(null)
 
-    internal fun kontekst(typer: Array<String>?): Map<String, String> = kontekster
-        .filter { typer == null || it.kontekstType in typer }
-        .fold(mapOf()) { result, kontekst -> result + kontekst.kontekstMap }
+    internal fun kontekst(typer: Array<String>?): Map<String, String> =
+        kontekster
+            .filter { typer == null || it.kontekstType in typer }
+            .fold(mapOf()) { result, kontekst -> result + kontekst.kontekstMap }
 
-    override fun compareTo(other: Aktivitet) = this.tidsstempel.compareTo(other.tidsstempel)
-        .let { if (it == 0) other.alvorlighetsgrad.compareTo(this.alvorlighetsgrad) else it }
+    override fun compareTo(other: Aktivitet) =
+        this.tidsstempel.compareTo(other.tidsstempel)
+            .let { if (it == 0) other.alvorlighetsgrad.compareTo(this.alvorlighetsgrad) else it }
 
     internal fun inOrder() = label + "\t" + this.toString()
 
@@ -46,4 +48,3 @@ sealed class Aktivitet(
 
     operator fun contains(kontekst: Aktivitetskontekst) = kontekst.toSpesifikkKontekst() in kontekster
 }
-

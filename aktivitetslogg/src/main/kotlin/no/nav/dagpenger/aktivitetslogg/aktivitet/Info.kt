@@ -16,8 +16,10 @@ class Info private constructor(
             return aktiviteter.filterIsInstance<Info>()
         }
 
-        fun opprett(kontekster: List<SpesifikkKontekst>, melding: String) =
-            Info(UUID.randomUUID(), kontekster, melding)
+        fun opprett(
+            kontekster: List<SpesifikkKontekst>,
+            melding: String,
+        ) = Info(UUID.randomUUID(), kontekster, melding)
     }
 
     override fun accept(visitor: AktivitetsloggVisitor) {

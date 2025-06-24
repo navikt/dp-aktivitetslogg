@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    id("common")
     id("org.openapi.generator") version "7.13.0"
     `java-library`
 }
@@ -8,8 +8,24 @@ repositories {
     mavenCentral()
 }
 
-tasks.named("compileKotlin").configure {
+tasks {
+    compileKotlin {
+        dependsOn("openApiGenerate")
+    }
+}
+
+tasks.named("runKtlintCheckOverMainSourceSet").configure {
     dependsOn("openApiGenerate")
+}
+
+tasks.named("runKtlintFormatOverMainSourceSet").configure {
+    dependsOn("openApiGenerate")
+}
+
+ktlint {
+    filter {
+        exclude { element -> element.file.path.contains("generated") }
+    }
 }
 
 sourceSets {
@@ -35,12 +51,14 @@ openApiGenerate {
             "models" to "",
         ),
     )
-    typeMappings = mapOf(
-        "DateTime" to "LocalDateTime",
-    )
-    importMappings = mapOf(
-        "LocalDateTime" to "java.time.LocalDateTime",
-    )
+    typeMappings =
+        mapOf(
+            "DateTime" to "LocalDateTime",
+        )
+    importMappings =
+        mapOf(
+            "LocalDateTime" to "java.time.LocalDateTime",
+        )
     modelNameSuffix.set("DTO")
     configOptions.set(
         mapOf(
