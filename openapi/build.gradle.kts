@@ -1,25 +1,29 @@
 plugins {
+    id("ch.acanda.gradle.fabrikt") version "1.16.1"
     id("common")
-    id("org.openapi.generator") version "7.13.0"
     `java-library`
-}
-
-repositories {
-    mavenCentral()
 }
 
 tasks {
     compileKotlin {
-        dependsOn("openApiGenerate")
+        dependsOn("fabriktGenerate")
     }
 }
 
 tasks.named("runKtlintCheckOverMainSourceSet").configure {
-    dependsOn("openApiGenerate")
+    dependsOn("fabriktGenerate")
 }
 
 tasks.named("runKtlintFormatOverMainSourceSet").configure {
-    dependsOn("openApiGenerate")
+    dependsOn("fabriktGenerate")
+}
+
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/kotlin", "${layout.buildDirectory.get()}/generated/src/main/kotlin"))
+        }
+    }
 }
 
 ktlint {
@@ -28,18 +32,33 @@ ktlint {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            setSrcDirs(listOf("${layout.buildDirectory.get()}/generated/src/main/kotlin"))
-        }
-    }
-}
-
 dependencies {
     implementation(libs.jackson.annotation)
 }
 
+fabrikt {
+    generate("aktivitetslogg") {
+        apiFile = file("$projectDir/src/main/resources/aktivitetslogg-api.yaml")
+        basePackage = "no.nav.dagpenger.aktivitetslogg.api"
+        skip = false
+        quarkusReflectionConfig = disabled
+        typeOverrides {
+            datetime = LocalDateTime
+        }
+        model {
+            generate = enabled
+            validationLibrary = NoValidation
+            extensibleEnums = disabled
+            sealedInterfacesForOneOf = enabled
+            ignoreUnknownProperties = disabled
+            nonNullMapValues = enabled
+            serializationLibrary = Jackson
+            suffix = "DTO"
+        }
+    }
+}
+
+/*
 openApiGenerate {
     generatorName.set("kotlin")
     inputSpec.set("$projectDir/src/main/resources/aktivitetslogg-api.yaml")
@@ -68,3 +87,4 @@ openApiGenerate {
         ),
     )
 }
+*/

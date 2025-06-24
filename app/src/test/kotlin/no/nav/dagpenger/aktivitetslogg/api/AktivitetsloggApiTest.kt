@@ -65,8 +65,8 @@ class AktivitetsloggApiTest {
                     val response = this.body<List<AktivitetsloggDTO>>()
                     response.size shouldBe 2
 
-                    response[0].atId shouldBe fjerde.toString()
-                    response[1].atId shouldBe tredje.toString()
+                    response[0].id shouldBe fjerde.toString()
+                    response[1].id shouldBe tredje.toString()
                 }
         }
 
@@ -142,10 +142,10 @@ class AktivitetsloggApiTest {
                     val response = this.body<List<AktivitetsloggDTO>>()
                     response.size shouldBe 4
 
-                    response[0].atId shouldBe fjerde.toString()
-                    response[1].atId shouldBe tredje.toString()
-                    response[2].atId shouldBe andre.toString()
-                    response[3].atId shouldBe første.toString()
+                    response[0].id shouldBe fjerde.toString()
+                    response[1].id shouldBe tredje.toString()
+                    response[2].id shouldBe andre.toString()
+                    response[3].id shouldBe første.toString()
                 }
         }
 
@@ -165,7 +165,7 @@ class AktivitetsloggApiTest {
                             val response = this.body<List<AktivitetsloggDTO>>()
                             response.size shouldBe 1
 
-                            response[0].atId shouldBe nyAktivitetslogg.toString()
+                            response[0].id shouldBe nyAktivitetslogg.toString()
                         }
                 }
                 async {
