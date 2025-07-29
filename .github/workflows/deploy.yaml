@@ -31,7 +31,7 @@ jobs:
         with:
           dependency-graph: generate-and-submit
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-      - run: ./gradlew--configuration-cache build installDist
+      - run: ./gradlew --configuration-cache build installDist
 
       - name: Publish results (unit test)
         uses: EnricoMi/publish-unit-test-result-action@v2
