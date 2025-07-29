@@ -1,5 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg
 
+import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -17,7 +18,7 @@ class AuditKontekstTest {
         val spesifikkKontekst = auditKontekst.toSpesifikkKontekst()
 
         spesifikkKontekst.kontekstType shouldBe "audit"
-        spesifikkKontekst.kontekstMap shouldBe
+        spesifikkKontekst.kontekstMap shouldContainExactly
             mapOf(
                 "appName" to "dagpenger-aktivitetslogg-ukjent",
                 "borgerIdent" to "audit",
