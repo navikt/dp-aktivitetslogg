@@ -23,14 +23,15 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: gradle/gradle-build-action@v3.5.0
+      - uses: gradle/actions/setup-gradle@v4
         id: build
         env:
-          ORG_GRADLE_PROJECT_githubUser: x-access-token
-          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+          # Eksluder test dependencies
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: compileClasspath|runtimeClasspath
         with:
           dependency-graph: generate-and-submit
-          arguments: --configuration-cache build installDist
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - run: ./gradlew--configuration-cache build installDist
 
       - name: Publish results (unit test)
         uses: EnricoMi/publish-unit-test-result-action@v2
