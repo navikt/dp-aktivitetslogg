@@ -19,8 +19,11 @@ class Varsel private constructor(
             return aktiviteter.filterIsInstance<Varsel>()
         }
 
-        internal fun opprett(kontekster: List<SpesifikkKontekst>, kode: Varselkode? = null, melding: String) =
-            Varsel(UUID.randomUUID(), kontekster, kode, melding = melding)
+        internal fun opprett(
+            kontekster: List<SpesifikkKontekst>,
+            kode: Varselkode? = null,
+            melding: String,
+        ) = Varsel(UUID.randomUUID(), kontekster, kode, melding = melding)
     }
 
     override fun accept(visitor: AktivitetsloggVisitor) {

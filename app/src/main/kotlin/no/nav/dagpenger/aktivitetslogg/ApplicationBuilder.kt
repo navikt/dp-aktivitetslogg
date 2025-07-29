@@ -45,7 +45,7 @@ internal class ApplicationBuilder(
                         )
                     }
                 }
-            }
+            },
         )
 
     init {

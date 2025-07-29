@@ -65,3 +65,11 @@ spec:
         - application: wonderwalled-azure
           namespace: nais
        {{/if}}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java

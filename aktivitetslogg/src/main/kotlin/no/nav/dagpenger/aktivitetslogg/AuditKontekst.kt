@@ -27,18 +27,18 @@ internal class AuditKontekst(
         WARN,
     }
 
-    override fun toSpesifikkKontekst(): SpesifikkKontekst {
-        return SpesifikkKontekst(
+    override fun toSpesifikkKontekst(): SpesifikkKontekst =
+        SpesifikkKontekst(
             kontekstType = kontekstType,
-            kontekstMap = mapOf(
-                "appName" to appNavn,
-                "borgerIdent" to borgerIdent,
-                "saksbehandlerNavIdent" to saksbehandlerNavIdent,
-                "alvorlighetsgrad" to alvorlighetsgrad.name,
-                "operasjon" to operasjon.name,
-            ),
+            kontekstMap =
+                mapOf(
+                    "appName" to appNavn,
+                    "borgerIdent" to borgerIdent,
+                    "saksbehandlerNavIdent" to saksbehandlerNavIdent,
+                    "alvorlighetsgrad" to alvorlighetsgrad.name,
+                    "operasjon" to operasjon.name,
+                ),
         )
-    }
 
     internal companion object {
         val kontekstType = "audit"

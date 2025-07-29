@@ -36,7 +36,7 @@ class AktivitetsloggMottakTest {
         rapid.sendTestMessage(newMessage.toJson())
 
         with(repository.hentAktivitetslogg("ident").first()) {
-            this.atEventName shouldBe "aktivitetslogg"
+            this.eventName shouldBe "aktivitetslogg"
             this.ident shouldBe "ident"
         }
     }

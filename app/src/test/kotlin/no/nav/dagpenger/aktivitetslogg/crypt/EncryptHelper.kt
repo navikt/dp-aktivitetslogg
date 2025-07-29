@@ -8,18 +8,20 @@ import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 import javax.crypto.Cipher
 
-
-fun SecretService.encrypt(ident: String, publicKeyString: String): String {
-
-    val publicKey = KeyFactory
-        .getInstance("RSA")
-        .generatePublic(
-            X509EncodedKeySpec(
-                Base64
-                    .getDecoder()
-                    .decode(publicKeyString)
+fun SecretService.encrypt(
+    ident: String,
+    publicKeyString: String,
+): String {
+    val publicKey =
+        KeyFactory
+            .getInstance("RSA")
+            .generatePublic(
+                X509EncodedKeySpec(
+                    Base64
+                        .getDecoder()
+                        .decode(publicKeyString),
+                ),
             )
-        )
 
     val encryptCipher = Cipher.getInstance("RSA")
     encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey)
@@ -28,7 +30,7 @@ fun SecretService.encrypt(ident: String, publicKeyString: String): String {
         Base64
             .getEncoder()
             .encodeToString(encryptCipher.doFinal(ident.toByteArray(StandardCharsets.UTF_8))),
-        "UTF-8"
+        "UTF-8",
     )
 }
 

@@ -1,14 +1,9 @@
 import java.net.URI
 
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    id("common")
     `maven-publish`
     `java-library`
-}
-
-
-repositories {
-    mavenCentral()
 }
 
 java {

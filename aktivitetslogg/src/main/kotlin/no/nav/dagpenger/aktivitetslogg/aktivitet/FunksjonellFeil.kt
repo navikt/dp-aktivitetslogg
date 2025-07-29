@@ -19,8 +19,11 @@ class FunksjonellFeil private constructor(
             return aktiviteter.filterIsInstance<FunksjonellFeil>()
         }
 
-        internal fun opprett(kontekster: List<SpesifikkKontekst>, kode: Varselkode, melding: String) =
-            FunksjonellFeil(UUID.randomUUID(), kontekster, kode, melding)
+        internal fun opprett(
+            kontekster: List<SpesifikkKontekst>,
+            kode: Varselkode,
+            melding: String,
+        ) = FunksjonellFeil(UUID.randomUUID(), kontekster, kode, melding)
     }
 
     override fun accept(visitor: AktivitetsloggVisitor) {
