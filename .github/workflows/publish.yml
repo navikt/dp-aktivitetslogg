@@ -30,7 +30,7 @@ jobs:
         with:
           dependency-graph: generate-and-submit
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-      - run: ./gradlew --no-configuration-cache test
+      - run: ./gradlew --configuration-cache test
   release:
     name: Create Release
     needs: build
@@ -63,7 +63,7 @@ jobs:
           java-version: 21.x
           cache: 'gradle'
       - name: publish
-        run: ./gradlew -Pversion="$(echo ${{ needs.release.outputs.tag }})" publish
+        run: ./gradlew --no-configuration-cache -Pversion="$(echo ${{ needs.release.outputs.tag }})" publish
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
