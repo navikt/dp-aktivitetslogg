@@ -50,7 +50,6 @@ internal class AktivitetsloggTest {
     fun `Melding sendt til forelder`() {
         val hendelse =
             TestHendelse(
-                "Hendelse",
                 aktivitetslogg.barn(),
             )
         "info message".also {
@@ -64,7 +63,6 @@ internal class AktivitetsloggTest {
     fun `Melding sendt fra barnebarn til forelder`() {
         val hendelse =
             TestHendelse(
-                "Hendelse",
                 aktivitetslogg.barn(),
             )
         hendelse.kontekst(testKontekst)
@@ -85,7 +83,6 @@ internal class AktivitetsloggTest {
     fun `Vis bare arbeidsgiveraktivitet`() {
         val hendelse1 =
             TestHendelse(
-                "Hendelse1",
                 aktivitetslogg.barn(),
             )
         hendelse1.kontekst(testKontekst)
@@ -99,7 +96,6 @@ internal class AktivitetsloggTest {
         hendelse1.info("annen info message")
         val hendelse2 =
             TestHendelse(
-                "Hendelse2",
                 aktivitetslogg.barn(),
             )
         hendelse2.kontekst(testKontekst)
@@ -119,7 +115,6 @@ internal class AktivitetsloggTest {
     fun `Behov kan ha detaljer`() {
         val hendelse1 =
             TestHendelse(
-                "Hendelse1",
                 aktivitetslogg.barn(),
             )
         hendelse1.kontekst(testKontekst)
@@ -159,7 +154,7 @@ internal class AktivitetsloggTest {
 
     @Test
     fun `det kan legges på AuditKontekst`() {
-        val hendelse = TestHendelse("Hendelse", aktivitetslogg)
+        val hendelse = TestHendelse(aktivitetslogg)
 
         // API / mediator
         hendelse.info("Heihei", "12345678901", "X123456", AuditOperasjon.READ)
@@ -174,7 +169,7 @@ internal class AktivitetsloggTest {
 
     @Test
     fun `varsel er en aktivitet`() {
-        val hendelse = TestHendelse("Hendelse", aktivitetslogg)
+        val hendelse = TestHendelse(aktivitetslogg)
         hendelse.varsel("Neinei", "12345678901", "X123456", AuditOperasjon.READ)
         assertVarsel("Neinei")
         aktivitetslogg.harAktiviteter() shouldBe true
@@ -258,8 +253,7 @@ internal class AktivitetsloggTest {
     }
 
     private class TestHendelse(
-        private val melding: String,
-        internal val logg: Aktivitetslogg,
+        val logg: Aktivitetslogg,
     ) : Aktivitetskontekst,
         IAktivitetslogg by logg {
         init {
