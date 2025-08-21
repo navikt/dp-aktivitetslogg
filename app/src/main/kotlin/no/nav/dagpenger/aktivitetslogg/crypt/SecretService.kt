@@ -1,6 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.crypt
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator

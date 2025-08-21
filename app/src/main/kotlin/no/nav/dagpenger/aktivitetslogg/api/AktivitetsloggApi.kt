@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.toUUID
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -10,14 +11,12 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.request.path
 import io.ktor.server.request.uri
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondTextWriter
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier

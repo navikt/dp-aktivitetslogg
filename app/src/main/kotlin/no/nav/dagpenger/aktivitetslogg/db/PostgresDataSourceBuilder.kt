@@ -3,7 +3,7 @@ package no.nav.dagpenger.aktivitetslogg.db
 import ch.qos.logback.core.util.OptionHelper.getEnv
 import ch.qos.logback.core.util.OptionHelper.getSystemProperty
 import com.zaxxer.hikari.HikariDataSource
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.FluentConfiguration
 import org.flywaydb.core.api.output.CleanResult

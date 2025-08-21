@@ -1,6 +1,7 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,7 +11,6 @@ import kotliquery.Query
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import mu.KotlinLogging
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
