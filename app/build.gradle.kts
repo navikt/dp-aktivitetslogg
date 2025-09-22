@@ -18,7 +18,7 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-serialization-jackson:${libs.versions.ktor.get()}")
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.15-16.10-ac41dc5c")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.19-13.31-61342e73")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.ktor.client)
@@ -27,7 +27,7 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.09.15-16.10-ac41dc5c")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.09.19-13.31-61342e73")
     testImplementation(libs.mockk)
 }
 
