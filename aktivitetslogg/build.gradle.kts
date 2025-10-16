@@ -34,7 +34,13 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = URI("file://${System.getProperty("user.home")}/.m2/repository")
+            url = URI("https://maven.pkg.github.com/navikt/dp-aktivitetslogg")
+            credentials {
+                val githubUser: String? by project
+                val githubPassword: String? by project
+                username = githubUser
+                password = githubPassword
+            }
         }
     }
 }
