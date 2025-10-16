@@ -12,12 +12,15 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val kotlinVersion = "2.2.0"
 dependencies {
-    testImplementation(kotlin("test"))
+    implementation(platform(kotlin("bom", kotlinVersion)))
+    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    testImplementation(kotlin("test", kotlinVersion))
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(22)
 }
 
 tasks.test {
