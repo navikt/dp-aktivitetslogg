@@ -15,12 +15,12 @@ repositories {
 val kotlinVersion = "2.2.0"
 dependencies {
     implementation(platform(kotlin("bom", kotlinVersion)))
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
-    testImplementation(kotlin("test", kotlinVersion))
+    implementation(kotlin("stdlib-jdk8"))
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
-    jvmToolchain(22)
+    jvmToolchain(21)
 }
 
 tasks.test {
