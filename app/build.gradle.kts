@@ -31,32 +31,6 @@ dependencies {
     testImplementation(libs.mockk)
 }
 
-tasks {
-    test {
-        useJUnitPlatform()
-        testLogging {
-            // events(TestLogEvent.STANDARD_OUT)
-        }
-    }
-    jar {
-        dependsOn(":openapi:jar")
-
-        manifest {
-            attributes["Main-Class"] = application.mainClass
-        }
-
-        archiveBaseName.set("app")
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    }
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
 application {
     mainClass.set("no.nav.dagpenger.aktivitetslogg.AppKt")
 }
