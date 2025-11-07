@@ -28,7 +28,18 @@ internal class AktivitetsloggMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
+        if (!packet["ident"].asText().matches(Regex("[0-9]{11}"))) {
+            logger.warn { "Mottok aktivitetslogg med ugyldig ident" }
+            return
+        }
+
         aktivitetsloggRepository.lagre(packet["@id"].asUUID(), packet["ident"].asText(), packet.toJson())
+    }
+
+    private companion object {
+        val logger =
+            io.github.oshai.kotlinlogging.KotlinLogging
+                .logger {}
     }
 }
 

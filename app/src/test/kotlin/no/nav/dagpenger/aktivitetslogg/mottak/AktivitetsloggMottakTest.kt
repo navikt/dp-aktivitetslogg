@@ -28,7 +28,7 @@ class AktivitetsloggMottakTest {
             JsonMessage.newMessage(
                 "aktivitetslogg",
                 mapOf(
-                    "ident" to "ident",
+                    "ident" to "12345678901",
                     "hendelse" to mapOf("type" to "bar", "meldingsreferanseId" to UUID.randomUUID()),
                     "aktiviteter" to emptyList<Any>(),
                 ),
@@ -37,7 +37,7 @@ class AktivitetsloggMottakTest {
 
         with(repository.hentAktivitetslogg("ident").first()) {
             this.eventName shouldBe "aktivitetslogg"
-            this.ident shouldBe "ident"
+            this.ident shouldBe "12345678901"
         }
     }
 }
