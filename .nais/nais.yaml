@@ -27,8 +27,6 @@ spec:
       cpu: 200m
       memory: 256Mi
   {{ ingresses }}
-  secureLogs:
-    enabled: true
   env:
     - name: KAFKA_RAPID_TOPIC
       value: teamdagpenger.rapid.v1
