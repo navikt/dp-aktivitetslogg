@@ -7,6 +7,10 @@ import io.micrometer.core.instrument.Clock
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.KontekstBackfill
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.aktivitetsloggApi
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
@@ -61,9 +65,17 @@ internal class ApplicationBuilder(
         rapidsConnection.start()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onStartup(rapidsConnection: RapidsConnection) {
         runMigration()
         logger.info { "Starter applikasjonen" }
+        GlobalScope.launch {
+            try {
+                KontekstBackfill(dataSource).run()
+            } catch (e: Exception) {
+                logger.error(e) { "Kontekst-backfill feilet" }
+            }
+        }
     }
 
     override fun onShutdown(rapidsConnection: RapidsConnection) {

@@ -121,6 +121,7 @@ internal class PostgresAktivitetsloggRepository(
                             """
                             INSERT INTO aktivitetslogg_kontekst (aktivitetslogg_id, kontekst_type, kontekst_verdi)
                             VALUES (:id, :type, :verdi)
+                            ON CONFLICT DO NOTHING
                             """.trimIndent(),
                         paramMap = mapOf("id" to id, "type" to type, "verdi" to verdi),
                     ).asUpdate,
