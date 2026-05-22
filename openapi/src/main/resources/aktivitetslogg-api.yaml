@@ -60,6 +60,30 @@ paths:
         - Aktivitetslogg
       security:
         - azureAd: [ ]
+  /aktivitetslogg/behandling/{behandlingId}:
+    get:
+      parameters:
+        - name: behandlingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aktivitetslogg'
+          description: OK
+      summary: Hent alle aktivitetslogger for en behandling
+      operationId: get-aktivitetslogg-for-behandling
+      tags:
+        - Aktivitetslogg
+      security:
+        - azureAd: [ ]
   /aktivitetslogg/tjenester:
     get:
       responses:

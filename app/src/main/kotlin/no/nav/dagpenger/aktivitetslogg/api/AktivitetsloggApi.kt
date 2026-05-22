@@ -73,6 +73,15 @@ internal fun Application.aktivitetsloggApi(
                         call.respond(HttpStatusCode.OK, aktivitetslogger)
                     }
                 }
+                get("behandling/{behandlingId}") {
+                    val behandlingId =
+                        call.parameters["behandlingId"] ?: return@get call.respond(
+                            HttpStatusCode.BadRequest,
+                            "behandlingId er påkrevd",
+                        )
+                    val aktivitetslogger = aktivitetsloggRepository.hentForBehandling(behandlingId)
+                    call.respond(HttpStatusCode.OK, aktivitetslogger)
+                }
                 get("tjenester") {
                     call.respond(HttpStatusCode.OK, aktivitetsloggRepository.hentTjenester())
                 }

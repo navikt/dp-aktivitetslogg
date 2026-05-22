@@ -14,6 +14,8 @@ internal interface AktivitetsloggRepository {
         since: UUID? = null,
     ): List<AktivitetsloggDTO>
 
+    fun hentForBehandling(behandlingId: String): List<AktivitetsloggDTO>
+
     fun hentAktivitetslogg(ident: String): List<AktivitetsloggDTO>
 
     fun lagre(
