@@ -53,20 +53,23 @@ internal class PostgresAktivitetsloggRepository(
         ),
     )
 
-    override fun hentForBehandling(behandlingId: String) =
-        hentAktivitetslogg(
-            queryOf(
-                //language=PostgreSQL
-                statement =
-                    """
-                    SELECT *
-                    FROM aktivitetslogg
-                    WHERE behandling_id = :behandlingId::uuid
-                    ORDER BY id ASC
-                    """.trimIndent(),
-                paramMap = mapOf("behandlingId" to UUID.fromString(behandlingId)),
-            ),
-        )
+    override fun hentForKontekst(
+        kontekstType: String,
+        kontekstVerdi: String,
+    ) = hentAktivitetslogg(
+        queryOf(
+            //language=PostgreSQL
+            statement =
+                """
+                SELECT a.*
+                FROM aktivitetslogg a
+                JOIN aktivitetslogg_kontekst k ON k.aktivitetslogg_id = a.id
+                WHERE k.kontekst_type = :kontekstType AND k.kontekst_verdi = :kontekstVerdi
+                ORDER BY a.id ASC
+                """.trimIndent(),
+            paramMap = mapOf("kontekstType" to kontekstType, "kontekstVerdi" to kontekstVerdi),
+        ),
+    )
 
     override fun hentAktivitetslogg(ident: String) =
         hentAktivitetslogg(
@@ -89,24 +92,42 @@ internal class PostgresAktivitetsloggRepository(
         ident: String,
         json: String,
     ) = using(sessionOf(ds)) { session ->
-        val behandlingId = finnBehandlingId(json)
-        session.run(
-            queryOf(
-                //language=PostgreSQL
-                statement =
-                    """
-                    INSERT INTO aktivitetslogg (melding_id, ident, json, behandling_id)
-                    VALUES (:uuid, :ident, :json::jsonb, :behandlingId::uuid)
-                    """.trimIndent(),
-                paramMap =
-                    mapOf(
-                        "uuid" to uuid,
-                        "ident" to ident,
-                        "json" to json,
-                        "behandlingId" to behandlingId?.toString(),
-                    ),
-            ).asUpdate,
-        )
+        session.transaction { tx ->
+            val id =
+                tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        statement =
+                            """
+                            INSERT INTO aktivitetslogg (melding_id, ident, json)
+                            VALUES (:uuid, :ident, :json::jsonb)
+                            RETURNING id
+                            """.trimIndent(),
+                        paramMap =
+                            mapOf(
+                                "uuid" to uuid,
+                                "ident" to ident,
+                                "json" to json,
+                            ),
+                    ).map { it.long("id") }.asSingle,
+                )!!
+
+            val kontekster = finnKontekster(json)
+            for ((type, verdi) in kontekster) {
+                tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        statement =
+                            """
+                            INSERT INTO aktivitetslogg_kontekst (aktivitetslogg_id, kontekst_type, kontekst_verdi)
+                            VALUES (:id, :type, :verdi)
+                            """.trimIndent(),
+                        paramMap = mapOf("id" to id, "type" to type, "verdi" to verdi),
+                    ).asUpdate,
+                )
+            }
+            1
+        }
     }.also {
         logger.info { "Annonserer ny aktivitetslogg med id=$uuid" }
         GlobalScope.launch {
@@ -146,18 +167,19 @@ internal class PostgresAktivitetsloggRepository(
             )
         }
 
-    private fun finnBehandlingId(json: String): UUID? =
+    private fun finnKontekster(json: String): Set<Pair<String, String>> =
         try {
             val node = jacksonObjectMapper.readTree(json)
             node["aktiviteter"]
                 ?.asSequence()
                 ?.flatMap { aktivitet -> aktivitet["kontekster"]?.asSequence() ?: emptySequence() }
-                ?.filter { kontekst -> kontekst["kontekstType"]?.asText() == "Behandling" }
-                ?.mapNotNull { kontekst -> kontekst["kontekstMap"]?.get("behandlingId")?.asText() }
-                ?.firstOrNull()
-                ?.let { UUID.fromString(it) }
+                ?.flatMap { kontekst ->
+                    val type = kontekst["kontekstType"]?.asText() ?: return@flatMap emptySequence()
+                    val map = kontekst["kontekstMap"] ?: return@flatMap emptySequence()
+                    map.fields().asSequence().map { (key, value) -> "$type.$key" to value.asText() }
+                }?.toSet() ?: emptySet()
         } catch (e: Exception) {
-            logger.warn(e) { "Kunne ikke trekke ut behandlingId fra aktivitetslogg" }
-            null
+            logger.warn(e) { "Kunne ikke trekke ut kontekster fra aktivitetslogg" }
+            emptySet()
         }
 }

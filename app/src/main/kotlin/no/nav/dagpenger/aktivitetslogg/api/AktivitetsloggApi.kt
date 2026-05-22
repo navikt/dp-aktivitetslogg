@@ -79,7 +79,7 @@ internal fun Application.aktivitetsloggApi(
                             HttpStatusCode.BadRequest,
                             "behandlingId er påkrevd",
                         )
-                    val aktivitetslogger = aktivitetsloggRepository.hentForBehandling(behandlingId)
+                    val aktivitetslogger = aktivitetsloggRepository.hentForKontekst("Behandling.behandlingId", behandlingId)
                     call.respond(HttpStatusCode.OK, aktivitetslogger)
                 }
                 get("tjenester") {
