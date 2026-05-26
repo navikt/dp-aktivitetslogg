@@ -39,12 +39,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: tjeneste
-          in: query
-          description: Tjenesten aktivitetet kommer fra
-          required: false
-          schema:
-            type: string
       responses:
         '200':
           content:
@@ -80,23 +74,6 @@ paths:
           description: OK
       summary: Hent alle aktivitetslogger for en behandling
       operationId: get-aktivitetslogg-for-behandling
-      tags:
-        - Aktivitetslogg
-      security:
-        - azureAd: [ ]
-  /aktivitetslogg/tjenester:
-    get:
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Tjeneste'
-          description: OK
-      summary: Lister ut alle tjenester
-      operationId: get-tjenester
       tags:
         - Aktivitetslogg
       security:
@@ -149,13 +126,6 @@ components:
           type: integer
           format: int64
           description: Antall aktiviteter i loggen.
-    Tjeneste:
-      type: object
-      description: Representerer en tjeneste i Kubernetes
-      properties:
-        name:
-          type: string
-          description: Tjenestenavn i Kubernetes
     Problem:
       type: object
       description: Implementasjon av Problem Details for HTTP APIs [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807)

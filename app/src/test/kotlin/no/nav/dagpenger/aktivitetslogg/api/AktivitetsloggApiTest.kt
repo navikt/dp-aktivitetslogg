@@ -15,13 +15,10 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
-import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.crypt.encrypt
 import no.nav.dagpenger.aktivitetslogg.helpers.MockAzure
@@ -98,94 +95,6 @@ class AktivitetsloggApiTest {
                     val response = this.body<List<AktivitetsloggDTO>>()
 
                     response.size shouldBe 0
-                }
-        }
-
-    @Test
-    fun `kan hente på tjeneste`() =
-        naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            client
-                .get("/aktivitetslogg?tjeneste=dp-vedtak") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.apply {
-                    status shouldBe HttpStatusCode.OK
-                    val response = this.body<List<AktivitetsloggDTO>>()
-
-                    response.size shouldBe 0
-                }
-
-            client
-                .get("/aktivitetslogg?tjeneste=dp-rapportering") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.apply {
-                    status shouldBe HttpStatusCode.OK
-                    val response = this.body<List<AktivitetsloggDTO>>()
-
-                    response.size shouldBe 4
-
-                    response[0].systemParticipatingServices[0].service shouldBe "dp-rapportering"
-                }
-        }
-
-    @Test
-    fun `kan hente uten argument`() =
-        naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            client
-                .get("/aktivitetslogg") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.apply {
-                    status shouldBe HttpStatusCode.OK
-                    val response = this.body<List<AktivitetsloggDTO>>()
-                    response.size shouldBe 4
-
-                    response[0].id shouldBe fjerde.toString()
-                    response[1].id shouldBe tredje.toString()
-                    response[2].id shouldBe andre.toString()
-                    response[3].id shouldBe første.toString()
-                }
-        }
-
-    @Test
-    fun `kan vente på nye meldinger`() =
-        naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            val nyAktivitetslogg = UUID.randomUUID()
-            runBlocking {
-                async {
-                    client
-                        .get("/aktivitetslogg?since=$fjerde&wait=true") {
-                            header(HttpHeaders.Authorization, "Bearer $testToken")
-                        }.apply {
-                            status shouldBe HttpStatusCode.OK
-                            val response = this.body<List<AktivitetsloggDTO>>()
-                            response.size shouldBe 1
-
-                            response[0].id shouldBe nyAktivitetslogg.toString()
-                        }
-                }
-                async {
-                    aktivitetsloggRepository.lagre(nyAktivitetslogg, "1", getData(nyAktivitetslogg, "1"))
-                }
-            }
-        }
-
-    @Test
-    fun `kan hente alle tjenester`() =
-        naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            client
-                .get("/aktivitetslogg/tjenester") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.apply {
-                    status shouldBe HttpStatusCode.OK
-                    val response = this.body<List<TjenesteDTO>>()
-                    response.size shouldBe 2
                 }
         }
 

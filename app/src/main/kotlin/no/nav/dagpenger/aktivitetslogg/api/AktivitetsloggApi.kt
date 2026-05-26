@@ -25,7 +25,6 @@ import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
 import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.crypt.toDecryptedStringOrNull
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
-import no.nav.dagpenger.aktivitetslogg.toStringOrNull
 
 private val logger = KotlinLogging.logger {}
 private val sikkerLogger = KotlinLogging.logger("tjenestekall")
@@ -55,12 +54,11 @@ internal fun Application.aktivitetsloggApi(
                     val since = params["since"]?.toUUID()
                     val wait = params["wait"]?.toBooleanStrict()
                     val ident = params["ident"]?.toDecryptedStringOrNull(secretService.privateKey())
-                    val tjeneste = params["tjeneste"]?.toStringOrNull()
 
                     sikkerLogger.info { "Ident=$ident" }
 
                     val aktivitetslogger =
-                        aktivitetsloggRepository.hentAktivitetslogg(ident, tjeneste, limit = limit, since = since)
+                        aktivitetsloggRepository.hentAktivitetslogg(ident, limit = limit, since = since)
                     if (aktivitetslogger.isEmpty() && wait == true) {
                         val flyt = aktivitetsloggRepository.flow()
                         call.respondTextWriter(contentType = ContentType.Application.Json) {
@@ -81,9 +79,6 @@ internal fun Application.aktivitetsloggApi(
                         )
                     val aktivitetslogger = aktivitetsloggRepository.hentForKontekst("Behandling.behandlingId", behandlingId)
                     call.respond(HttpStatusCode.OK, aktivitetslogger)
-                }
-                get("tjenester") {
-                    call.respond(HttpStatusCode.OK, aktivitetsloggRepository.hentTjenester())
                 }
                 get("antall") {
                     call.respond(

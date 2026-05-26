@@ -13,7 +13,6 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
-import no.nav.dagpenger.aktivitetslogg.api.models.TjenesteDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import java.util.UUID
 import javax.sql.DataSource
@@ -27,7 +26,6 @@ internal class PostgresAktivitetsloggRepository(
 
     override fun hentAktivitetslogg(
         ident: String?,
-        tjeneste: String?,
         limit: Int,
         since: UUID?,
     ) = hentAktivitetslogg(
@@ -39,14 +37,12 @@ internal class PostgresAktivitetsloggRepository(
                 FROM aktivitetslogg
                 WHERE (:since::uuid IS NULL OR id > COALESCE((SELECT id FROM aktivitetslogg WHERE melding_id = :since), id))
                 AND (:ident::text IS NULL OR ident = :ident)
-                AND (:tjeneste::text IS NULL OR json->'system_participating_services' @> '[{"service": "$tjeneste"}]' )
                 ORDER BY id DESC
                 LIMIT :limit
                 """.trimIndent(),
             paramMap =
                 mapOf(
                     "ident" to ident,
-                    "tjeneste" to tjeneste,
                     "since" to since,
                     "limit" to limit,
                 ),
@@ -138,21 +134,6 @@ internal class PostgresAktivitetsloggRepository(
     }
 
     override fun flow() = messageSharedFlow.asSharedFlow()
-
-    override fun hentTjenester(): List<TjenesteDTO> =
-        using(sessionOf(ds)) { session ->
-            session.run(
-                queryOf(
-                    //language=PostgreSQL
-                    statement =
-                        """
-                        select distinct 
-                            jsonb_array_elements(json->'system_participating_services')->>'service' as name
-                        from aktivitetslogg
-                        """.trimIndent(),
-                ).map { row -> TjenesteDTO(name = row.string("name")) }.asList,
-            )
-        }
 
     override fun antallAktiviteter(): AntallAktiviteterDTO? =
         using(sessionOf(ds)) { session ->
