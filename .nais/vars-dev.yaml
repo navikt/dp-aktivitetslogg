@@ -9,4 +9,3 @@ gcp:
 ingresses: |
   ingresses:
     - https://dp-aktivitetslogg.intern.dev.nav.no
-    - https://dp-aktivitetslogg.ansatt.dev.nav.no
