@@ -21,18 +21,12 @@ import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.auth.AzureAd
 import no.nav.dagpenger.aktivitetslogg.api.auth.verifier
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
-import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
-import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
-import no.nav.dagpenger.aktivitetslogg.crypt.toDecryptedStringOrNull
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 
 private val logger = KotlinLogging.logger {}
 private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 
-internal fun Application.aktivitetsloggApi(
-    aktivitetsloggRepository: AktivitetsloggRepository,
-    secretService: SecretService,
-) {
+internal fun Application.aktivitetsloggApi(aktivitetsloggRepository: AktivitetsloggRepository) {
     install(Authentication) {
         jwt("azureAd") {
             verifier(AzureAd)
@@ -53,7 +47,7 @@ internal fun Application.aktivitetsloggApi(
                     val limit = params["limit"]?.toIntOrNull() ?: 50
                     val since = params["since"]?.toUUID()
                     val wait = params["wait"]?.toBooleanStrict()
-                    val ident = params["ident"]?.toDecryptedStringOrNull(secretService.privateKey())
+                    val ident = params["ident"]
 
                     sikkerLogger.info { "Ident=$ident" }
 
@@ -84,12 +78,6 @@ internal fun Application.aktivitetsloggApi(
                     call.respond(
                         HttpStatusCode.OK,
                         aktivitetsloggRepository.antallAktiviteter() ?: AntallAktiviteterDTO(0),
-                    )
-                }
-                get("keys") {
-                    call.respond(
-                        HttpStatusCode.OK,
-                        KeysDTO(public = secretService.publicKeyAsString()),
                     )
                 }
             }

@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.KontekstBackfill
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.aktivitetsloggApi
-import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.aktivitetslogg.mottak.AktivitetsloggMottak
@@ -25,7 +24,6 @@ internal class ApplicationBuilder(
     configuration: Map<String, String>,
 ) : RapidsConnection.StatusListener {
     private val aktivitetsloggRepository = PostgresAktivitetsloggRepository(dataSource)
-    private val secretService = SecretService()
     private val rapidsConnection: RapidsConnection =
         RapidApplication.create(
             configuration,
@@ -46,7 +44,6 @@ internal class ApplicationBuilder(
                     ) {
                         aktivitetsloggApi(
                             aktivitetsloggRepository = aktivitetsloggRepository,
-                            secretService = secretService,
                         )
                     }
                 }

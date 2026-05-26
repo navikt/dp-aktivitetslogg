@@ -35,7 +35,7 @@ paths:
             default: false
         - name: ident
           in: query
-          description: Kryptert identitet til den aktivitetene gjelder for
+          description: Identitet til den aktivitetene gjelder for
           required: false
           schema:
             type: string
@@ -93,31 +93,9 @@ paths:
         - Aktivitetslogg
       security:
         - azureAd: [ ]
-  /aktivitetslogg/keys:
-    get:
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Keys'
-          description: OK
-      summary: Nøkler for kryptering av ident.
-      operationId: get-keys
-      tags:
-        - Aktivitetslogg
-      security:
-        - azureAd: [ ]
 
 components:
   schemas:
-    Keys:
-      type: object
-      description: Nøkler for kryptering av ident.
-      properties:
-        public:
-          type: string
-          description: Public key for kryptering av ident.
     AntallAktiviteter:
       type: object
       description: Representerer antall aktiviteter i loggen.

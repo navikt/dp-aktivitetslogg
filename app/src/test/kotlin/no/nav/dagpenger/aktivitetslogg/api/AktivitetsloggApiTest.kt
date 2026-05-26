@@ -4,7 +4,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -18,9 +17,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
-import no.nav.dagpenger.aktivitetslogg.api.models.KeysDTO
-import no.nav.dagpenger.aktivitetslogg.crypt.SecretService
-import no.nav.dagpenger.aktivitetslogg.crypt.encrypt
 import no.nav.dagpenger.aktivitetslogg.helpers.MockAzure
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
@@ -42,7 +38,6 @@ class AktivitetsloggApiTest {
             lagre(tredje, "3", getData(tredje, "3"))
             lagre(fjerde, "3", getData(fjerde, "3"))
         }
-    private val secretService = SecretService()
 
     @Test
     fun `repository feiler på duplikater`() {
@@ -52,7 +47,7 @@ class AktivitetsloggApiTest {
     @Test
     fun `kan hente med since og limit`() =
         naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+            aktivitetsloggApi(aktivitetsloggRepository)
         }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
             client
                 .get("/aktivitetslogg?since=$andre&limit=2") {
@@ -70,12 +65,10 @@ class AktivitetsloggApiTest {
     @Test
     fun `kan hente på ident`() =
         naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+            aktivitetsloggApi(aktivitetsloggRepository)
         }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            val encryptedIdent = secretService.encrypt("3", secretService.publicKeyAsString())
-
             client
-                .get("/aktivitetslogg?ident=$encryptedIdent") {
+                .get("/aktivitetslogg?ident=3") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
                 }.apply {
                     status shouldBe HttpStatusCode.OK
@@ -88,7 +81,7 @@ class AktivitetsloggApiTest {
                 }
 
             client
-                .get("/aktivitetslogg?ident=${secretService.encrypt("333", secretService.publicKeyAsString())}") {
+                .get("/aktivitetslogg?ident=333") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
                 }.apply {
                     status shouldBe HttpStatusCode.OK
@@ -101,7 +94,7 @@ class AktivitetsloggApiTest {
     @Test
     fun `kan hente antall aktiviteter`() =
         naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
+            aktivitetsloggApi(aktivitetsloggRepository)
         }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
             client
                 .get("/aktivitetslogg/antall") {
@@ -110,21 +103,6 @@ class AktivitetsloggApiTest {
                     status shouldBe HttpStatusCode.OK
                     val antallAktiviteter = this.body<AntallAktiviteterDTO>()
                     antallAktiviteter.antall shouldBe 4
-                }
-        }
-
-    @Test
-    fun `kan hente public key`() =
-        naisfulTestApp({
-            aktivitetsloggApi(aktivitetsloggRepository, secretService)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
-            client
-                .get("/aktivitetslogg/keys") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.apply {
-                    status shouldBe HttpStatusCode.OK
-                    val response = this.body<KeysDTO>()
-                    response.public shouldNotBe null
                 }
         }
 
