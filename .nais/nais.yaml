@@ -51,10 +51,11 @@ spec:
   azure:
     application:
       enabled: true
-      tenant: nav.no
+      allowAllUsers: false
+      tenant: {{azure.tenant}}
       claims:
         groups:
-          - id: 4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e # teamdagpenger
+          - id: {{azure.grupper.saksbehandler}}
   accessPolicy:
     inbound:
       rules:
