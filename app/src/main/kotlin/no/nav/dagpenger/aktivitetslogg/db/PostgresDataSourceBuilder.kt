@@ -22,21 +22,15 @@ private val logger = KotlinLogging.logger {}
 internal object PostgresDataSourceBuilder {
     const val DB_USERNAME_KEY = "DB_USERNAME"
     const val DB_PASSWORD_KEY = "DB_PASSWORD"
-    const val DB_URL_KEY = "DB_URL"
     const val DB_JDBC_URL_KEY = "DB_JDBC_URL"
 
     private fun getOrThrow(key: String): String =
         getEnv(key.toSnakeCase().also { logger.info { "Henter $it fra environment variables" } }) ?: getSystemProperty(key)
 
-    private fun getOrElse(
-        key: String,
-        secondKey: String,
-    ): String = runCatching { getOrThrow(key) }.getOrElse { getOrThrow(secondKey) }
-
     val dataSource by lazy {
         HikariDataSource().apply {
             // Støtter både DB_URL og DB_JDBC_URL for å være kompatibel med både databaser laget der JDBC URL er inkludert og der det ikke er det. DB_JDBC_URL har prioritet over DB_URL
-            jdbcUrl = getOrElse(DB_JDBC_URL_KEY, DB_URL_KEY).ensurePrefix("jdbc:postgresql://").stripCredentials()
+            jdbcUrl = getOrThrow(DB_JDBC_URL_KEY).ensurePrefix("jdbc:postgresql://").stripCredentials()
             username = getOrThrow(DB_USERNAME_KEY)
             password = getOrThrow(DB_PASSWORD_KEY)
 
