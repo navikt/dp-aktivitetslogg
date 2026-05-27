@@ -28,13 +28,13 @@ internal object Postgres {
 
     private fun setup() {
         System.setProperty(ConfigUtils.CLEAN_DISABLED, "false")
-        System.setProperty(PostgresDataSourceBuilder.DB_URL_KEY, instance.jdbcUrl)
+        System.setProperty(PostgresDataSourceBuilder.DB_JDBC_URL_KEY, instance.jdbcUrl)
         System.setProperty(PostgresDataSourceBuilder.DB_PASSWORD_KEY, instance.password)
         System.setProperty(PostgresDataSourceBuilder.DB_USERNAME_KEY, instance.username)
     }
 
     private fun tearDown() {
-        System.clearProperty(PostgresDataSourceBuilder.DB_URL_KEY)
+        System.clearProperty(PostgresDataSourceBuilder.DB_JDBC_URL_KEY)
         System.clearProperty(PostgresDataSourceBuilder.DB_USERNAME_KEY)
         System.clearProperty(PostgresDataSourceBuilder.DB_PASSWORD_KEY)
         System.clearProperty(ConfigUtils.CLEAN_DISABLED)
