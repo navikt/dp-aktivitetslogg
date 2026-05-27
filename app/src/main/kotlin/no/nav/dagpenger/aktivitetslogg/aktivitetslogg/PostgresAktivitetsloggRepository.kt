@@ -128,8 +128,7 @@ internal class PostgresAktivitetsloggRepository(
     }.also {
         logger.info { "Annonserer ny aktivitetslogg med id=$uuid" }
         GlobalScope.launch {
-            val emitted = messageSharedFlow.emit(listOf(aktivitetsloggDTO(json)))
-            logger.info { "tryEmit as $emitted" }
+            messageSharedFlow.emit(listOf(aktivitetsloggDTO(json)))
         }
     }
 
