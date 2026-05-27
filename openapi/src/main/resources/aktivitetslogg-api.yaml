@@ -6,7 +6,7 @@ info:
   contact:
     name: '#team-dagpenger'
 servers:
-  - url: https://dp-aktivitetslogg.intern.dev.nav.no
+  - url: http://dp-aktivitetslogg
     description: dev
 paths:
   /aktivitetslogg:
