@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 
 // Understands how to create a data source from environment variables
 internal object PostgresDataSourceBuilder {
-    const val DB_URL_KEY = "DB_URL"
+    const val DB_URL_KEY = "DB_JDBC_URL"
     const val DB_USERNAME_KEY = "DB_USERNAME"
     const val DB_PASSWORD_KEY = "DB_PASSWORD"
 
@@ -29,7 +29,7 @@ internal object PostgresDataSourceBuilder {
 
     val dataSource by lazy {
         HikariDataSource().apply {
-            jdbcUrl = getOrThrow(DB_URL_KEY).ensurePrefix("jdbc:postgresql://").stripCredentials()
+            jdbcUrl = getOrThrow(DB_URL_KEY) // .ensurePrefix("jdbc:postgresql://").stripCredentials()
             username = getOrThrow(DB_USERNAME_KEY)
             password = getOrThrow(DB_PASSWORD_KEY)
 
