@@ -40,7 +40,7 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_18
-        highAvailability: true
+        highAvailability: {{gcp.sql.highAvailability}}
         diskAutoresize: true
         pointInTimeRecovery: true
         tier: "{{gcp.sql.tier}}"

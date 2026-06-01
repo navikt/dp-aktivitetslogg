@@ -1,11 +1,9 @@
 kafka_pool: nav-prod
-
 wonderwalled: false
-
 gcp:
   sql:
     tier: db-custom-1-3840
-
+    highAvailability: true
 azure:
   tenant: nav.no
   grupper:

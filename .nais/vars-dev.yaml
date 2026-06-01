@@ -1,11 +1,9 @@
 kafka_pool: nav-dev
-
 wonderwalled: true
-
 gcp:
   sql:
     tier: db-f1-micro
-
+    highAvailability: false
 azure:
   tenant: trygdeetaten.no
   grupper:
