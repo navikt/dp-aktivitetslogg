@@ -22,6 +22,8 @@ internal class AktivitetsloggMottak(
             }.register(this)
     }
 
+    private val skipList = listOf(UUID.fromString("e20d616b-0d83-4c89-9942-3319a9177c6f"))
+
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
@@ -33,7 +35,13 @@ internal class AktivitetsloggMottak(
             return
         }
 
-        aktivitetsloggRepository.lagre(packet["@id"].asUUID(), packet["ident"].asText(), packet.toJson())
+        val meldingId = packet["@id"].asUUID()
+        if (meldingId in skipList) {
+            logger.warn { "Hopper over melding i skipList" }
+            return
+        }
+
+        aktivitetsloggRepository.lagre(meldingId, packet["ident"].asText(), packet.toJson())
     }
 
     private companion object {
