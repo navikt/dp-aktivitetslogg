@@ -22,7 +22,7 @@ internal class AktivitetsloggMottak(
             }.register(this)
     }
 
-    private val skipList = listOf(UUID.fromString("e20d616b-0d83-4c89-9942-3319a9177c6f"))
+    private val skipList = listOf(UUID.fromString("1e7127ba-404a-4cd2-b2b9-bdbf94d232b9"))
 
     override fun onPacket(
         packet: JsonMessage,
