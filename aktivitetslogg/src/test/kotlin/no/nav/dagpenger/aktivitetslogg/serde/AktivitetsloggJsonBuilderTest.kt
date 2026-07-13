@@ -1,6 +1,5 @@
 package no.nav.dagpenger.aktivitetslogg.serde
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.assertions.throwables.shouldThrow
@@ -8,6 +7,7 @@ import no.nav.dagpenger.aktivitetslogg.Aktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.AuditOperasjon
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
 import org.junit.jupiter.api.BeforeEach
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import kotlin.test.Test
 
 internal class AktivitetsloggJsonBuilderTest {

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.aktivitetslogg.aktivitetslogg
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -14,6 +13,7 @@ import kotliquery.using
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -155,9 +155,9 @@ internal class PostgresAktivitetsloggRepository(
                 ?.asSequence()
                 ?.flatMap { aktivitet -> aktivitet["kontekster"]?.asSequence() ?: emptySequence() }
                 ?.flatMap { kontekst ->
-                    val type = kontekst["kontekstType"]?.asText() ?: return@flatMap emptySequence()
+                    val type = kontekst["kontekstType"]?.asString() ?: return@flatMap emptySequence()
                     val map = kontekst["kontekstMap"] ?: return@flatMap emptySequence()
-                    map.fields().asSequence().map { (key, value) -> "$type.$key" to value.asText() }
+                    map.properties().asSequence().map { (key, value) -> "$type.$key" to value.asString() }
                 }?.toSet() ?: emptySet()
         } catch (e: Exception) {
             logger.warn(e) { "Kunne ikke trekke ut kontekster fra aktivitetslogg" }

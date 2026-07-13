@@ -1,27 +1,32 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.JacksonConverter
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.testing.ApplicationTestBuilder
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
 import no.nav.dagpenger.aktivitetslogg.api.models.AntallAktiviteterDTO
 import no.nav.dagpenger.aktivitetslogg.helpers.MockAzure
 import no.nav.dagpenger.aktivitetslogg.helpers.db.Postgres.withMigratedDb
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
+import no.nav.dagpenger.aktivitetslogg.statusPagesConfig
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.util.UUID
 
 class AktivitetsloggApiTest {
@@ -46,9 +51,9 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente med since og limit`() =
-        naisfulTestApp({
+        testApplication({
             aktivitetsloggApi(aktivitetsloggRepository)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+        }) {
             client
                 .get("/aktivitetslogg?since=$andre&limit=2") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -64,9 +69,9 @@ class AktivitetsloggApiTest {
 
     @Test
     fun `kan hente på ident`() =
-        naisfulTestApp({
+        testApplication({
             aktivitetsloggApi(aktivitetsloggRepository)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+        }) {
             client
                 .get("/aktivitetslogg?ident=3") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -92,10 +97,10 @@ class AktivitetsloggApiTest {
         }
 
     @Test
-    fun `kan hente antall aktiviteter`() =
-        naisfulTestApp({
+    fun `kan hente antall aktiviteter`() {
+        testApplication({
             aktivitetsloggApi(aktivitetsloggRepository)
-        }, jacksonObjectMapper, PrometheusMeterRegistry(PrometheusConfig.DEFAULT)) {
+        }) {
             client
                 .get("/aktivitetslogg/antall") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
@@ -105,11 +110,42 @@ class AktivitetsloggApiTest {
                     antallAktiviteter.antall shouldBe 4
                 }
         }
+    }
+
+    internal fun testApplication(
+        moduleFunction: Application.() -> Unit,
+        test: suspend TestContext.() -> Unit,
+    ) {
+        testApplication {
+            application {
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    register(ContentType.Application.Json, JacksonConverter(jacksonObjectMapper))
+                }
+                install(StatusPages) {
+                    statusPagesConfig()
+                }
+                moduleFunction()
+            }
+
+            val testClient =
+                createClient {
+                    install(ContentNegotiation) {
+                        register(ContentType.Application.Json, JacksonConverter(jacksonObjectMapper))
+                    }
+                }
+
+            test(TestContext(testClient))
+        }
+    }
+
+    class TestContext(
+        val client: HttpClient,
+    )
 
     private fun ApplicationTestBuilder.client() =
         createClient {
             install(ContentNegotiation) {
-                jackson { registerModule(JavaTimeModule()) }
+                jackson { }
             }
         }
 }

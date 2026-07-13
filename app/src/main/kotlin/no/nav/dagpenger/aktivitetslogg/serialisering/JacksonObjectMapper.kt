@@ -1,27 +1,25 @@
 package no.nav.dagpenger.aktivitetslogg.serialisering
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.SerializationFeature
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinFeature
+import tools.jackson.module.kotlin.KotlinModule
 
-fun ObjectMapper.configureJackson() {
-    registerModule(JavaTimeModule())
-    registerModule(
-        KotlinModule.Builder().apply {
-            enable(KotlinFeature.NullToEmptyCollection)
-            enable(KotlinFeature.NullToEmptyMap)
-            enable(KotlinFeature.NullIsSameAsDefault)
-            enable(KotlinFeature.SingletonSupport)
-            enable(KotlinFeature.StrictNullChecks)
-        }.build(),
-    )
-    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    enable(SerializationFeature.INDENT_OUTPUT)
+val jacksonObjectMapper by lazy {
+    JsonMapper
+        .builder()
+        .addModule(
+            KotlinModule
+                .Builder()
+                .apply {
+                    enable(KotlinFeature.NullToEmptyCollection)
+                    enable(KotlinFeature.NullToEmptyMap)
+                    enable(KotlinFeature.NullIsSameAsDefault)
+                    enable(KotlinFeature.SingletonSupport)
+                    enable(KotlinFeature.StrictNullChecks)
+                }.build(),
+        ).enable(SerializationFeature.INDENT_OUTPUT)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build()
 }
-
-val jacksonObjectMapper by lazy { jacksonObjectMapper().apply { configureJackson() } }

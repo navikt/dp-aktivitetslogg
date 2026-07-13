@@ -1,6 +1,5 @@
 package no.nav.dagpenger.aktivitetslogg.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -8,6 +7,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.AktivitetsloggRepository
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 internal class AktivitetsloggMottak(
@@ -30,7 +30,7 @@ internal class AktivitetsloggMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        if (!packet["ident"].asText().matches(Regex("[0-9]{11}"))) {
+        if (!packet["ident"].asString().matches(Regex("[0-9]{11}"))) {
             logger.warn { "Mottok aktivitetslogg med ugyldig ident" }
             return
         }
@@ -41,7 +41,7 @@ internal class AktivitetsloggMottak(
             return
         }
 
-        aktivitetsloggRepository.lagre(meldingId, packet["ident"].asText(), packet.toJson())
+        aktivitetsloggRepository.lagre(meldingId, packet["ident"].asString(), packet.toJson())
     }
 
     private companion object {
@@ -51,4 +51,4 @@ internal class AktivitetsloggMottak(
     }
 }
 
-private fun JsonNode.asUUID() = UUID.fromString(asText())
+private fun JsonNode.asUUID() = UUID.fromString(asString())

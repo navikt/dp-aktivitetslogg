@@ -15,10 +15,14 @@ dependencies {
     implementation(libs.bundles.postgres)
     implementation(libs.bundles.ktor.server)
 
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.kotlin)
+
     implementation("io.ktor:ktor-server-swagger:${libs.versions.ktor.get()}")
-    implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-serialization-jackson:${libs.versions.ktor.get()}")
-    implementation("com.github.navikt.tbd-libs:naisful-app:20260702.1010")
+    implementation("io.ktor:ktor-server-content-negotiation:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-status-pages:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-serialization-jackson3:${libs.versions.ktor.get()}")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.ktor.client)
@@ -27,7 +31,6 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:20260702.1010")
     testImplementation(libs.mockk)
 }
 

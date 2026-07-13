@@ -1,12 +1,12 @@
 package no.nav.dagpenger.aktivitetslogg
 
-import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.micrometer.core.instrument.Clock
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import io.prometheus.metrics.model.registry.PrometheusRegistry
+import io.ktor.http.ContentType
+import io.ktor.serialization.jackson3.JacksonConverter
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.statuspages.StatusPages
 import kotlinx.coroutines.DelicateCoroutinesApi
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.aktivitetsloggApi
@@ -15,7 +15,6 @@ import no.nav.dagpenger.aktivitetslogg.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.aktivitetslogg.mottak.AktivitetsloggMottak
 import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.slf4j.LoggerFactory
 
 internal class ApplicationBuilder(
     configuration: Map<String, String>,
@@ -25,24 +24,16 @@ internal class ApplicationBuilder(
         RapidApplication.create(
             configuration,
             builder = {
-                withKtor { preStopHook, rapid ->
-                    naisApp(
-                        meterRegistry =
-                            PrometheusMeterRegistry(
-                                PrometheusConfig.DEFAULT,
-                                PrometheusRegistry.defaultRegistry,
-                                Clock.SYSTEM,
-                            ),
-                        objectMapper = jacksonObjectMapper,
-                        applicationLogger = LoggerFactory.getLogger("ApplicationLogger"),
-                        callLogger = LoggerFactory.getLogger("CallLogger"),
-                        aliveCheck = rapid::isReady,
-                        readyCheck = rapid::isReady,
-                    ) {
-                        aktivitetsloggApi(
-                            aktivitetsloggRepository = aktivitetsloggRepository,
-                        )
+                withKtorModule {
+                    install(ContentNegotiation) {
+                        register(ContentType.Application.Json, JacksonConverter(jacksonObjectMapper))
                     }
+                    install(StatusPages) {
+                        statusPagesConfig()
+                    }
+                    aktivitetsloggApi(
+                        aktivitetsloggRepository = aktivitetsloggRepository,
+                    )
                 }
             },
         )
