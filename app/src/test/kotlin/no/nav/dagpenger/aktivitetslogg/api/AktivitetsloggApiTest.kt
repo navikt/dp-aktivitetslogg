@@ -10,12 +10,10 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
 import io.ktor.serialization.jackson3.JacksonConverter
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.aktivitetslogg.aktivitetslogg.PostgresAktivitetsloggRepository
 import no.nav.dagpenger.aktivitetslogg.api.models.AktivitetsloggDTO
@@ -26,7 +24,6 @@ import no.nav.dagpenger.aktivitetslogg.serialisering.jacksonObjectMapper
 import no.nav.dagpenger.aktivitetslogg.statusPagesConfig
 import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
-import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.util.UUID
 
 class AktivitetsloggApiTest {
@@ -141,13 +138,6 @@ class AktivitetsloggApiTest {
     class TestContext(
         val client: HttpClient,
     )
-
-    private fun ApplicationTestBuilder.client() =
-        createClient {
-            install(ContentNegotiation) {
-                jackson { }
-            }
-        }
 }
 
 // language=JSON
