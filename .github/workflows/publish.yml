@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/publish.yml
       - aktivitetslogg/**
+  workflow_dispatch:
 
 jobs:
   build:
