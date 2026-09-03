@@ -30,7 +30,6 @@ interface AktivitetsloggObserver {
     fun varsel(
         id: UUID,
         label: Char,
-        kode: Varselkode?,
         melding: String,
         kontekster: List<SpesifikkKontekst>,
         tidsstempel: LocalDateTime,
@@ -40,7 +39,6 @@ interface AktivitetsloggObserver {
     fun funksjonellFeil(
         id: UUID,
         label: Char,
-        kode: Varselkode,
         melding: String,
         kontekster: List<SpesifikkKontekst>,
         tidsstempel: LocalDateTime,

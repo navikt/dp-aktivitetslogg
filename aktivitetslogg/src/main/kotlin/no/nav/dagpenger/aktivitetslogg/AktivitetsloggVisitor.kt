@@ -58,7 +58,6 @@ interface AktivitetsloggVisitor {
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
         varsel: Varsel,
-        kode: Varselkode?,
         melding: String,
         tidsstempel: String,
     ) {

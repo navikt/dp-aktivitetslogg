@@ -3,7 +3,6 @@ package no.nav.dagpenger.aktivitetslogg.serde
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggVisitor
 import no.nav.dagpenger.aktivitetslogg.IAktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.SpesifikkKontekst
-import no.nav.dagpenger.aktivitetslogg.Varselkode
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Behov
 import no.nav.dagpenger.aktivitetslogg.aktivitet.FunksjonellFeil
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Hendelse
@@ -97,7 +96,6 @@ class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : Aktivitetslog
         id: UUID,
         kontekster: List<SpesifikkKontekst>,
         varsel: Varsel,
-        kode: Varselkode?,
         melding: String,
         tidsstempel: String,
     ) {

@@ -34,9 +34,7 @@ interface IAktivitetslogg {
         operasjon: AuditOperasjon,
     )
 
-    fun varsel(kode: Varselkode)
-
-    fun funksjonellFeil(kode: Varselkode)
+    fun funksjonellFeil(melding: String)
 
     fun logiskFeil(
         melding: String,

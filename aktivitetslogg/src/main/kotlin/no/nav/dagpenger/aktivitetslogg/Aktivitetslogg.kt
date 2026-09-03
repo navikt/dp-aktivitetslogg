@@ -54,10 +54,6 @@ class Aktivitetslogg(
         add(Varsel.opprett(kontekster.toSpesifikk(), melding = melding))
     }
 
-    override fun varsel(kode: Varselkode) {
-        add(kode.varsel(kontekster.toSpesifikk()))
-    }
-
     override fun behov(
         type: Behov.Behovtype,
         melding: String,
@@ -66,9 +62,8 @@ class Aktivitetslogg(
         add(Behov.opprett(type, kontekster.toSpesifikk(), melding, detaljer))
     }
 
-    override fun funksjonellFeil(kode: Varselkode) {
-        TODO("Brukes i kombinasjon med varsel til saksbehandler")
-        // add(kode.funksjonellFeil(kontekster.toSpesifikk()))
+    override fun funksjonellFeil(melding: String) {
+        add(FunksjonellFeil.opprett(kontekster.toSpesifikk(), melding = melding))
     }
 
     override fun logiskFeil(
