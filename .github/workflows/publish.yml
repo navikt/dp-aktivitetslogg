@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v6.0.0
         with:
           distribution: temurin
-          java-version: 25
+          java-version: 26.0.2+10
       - uses: gradle/wrapper-validation-action@v3.5.0
       - uses: gradle/actions/setup-gradle@v6.3.0
         env:
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/setup-java@v6.0.0
         with:
           distribution: temurin
-          java-version: 25.x
+          java-version: 26.0.2+10
           cache: 'gradle'
       - name: publish
         run: ./gradlew --no-configuration-cache -Pversion="$(echo ${{ needs.release.outputs.tag }})" publish
