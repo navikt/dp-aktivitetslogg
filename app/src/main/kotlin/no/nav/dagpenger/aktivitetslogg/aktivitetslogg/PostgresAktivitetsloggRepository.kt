@@ -107,6 +107,13 @@ internal class PostgresAktivitetsloggRepository(
                                 "json" to json,
                             ),
                     ).map { it.long("id") }.asSingle,
+                    // Meldingen finnes allerede når ON CONFLICT DO NOTHING traff, da returneres ingen rad
+                ) ?: tx.run(
+                    queryOf(
+                        //language=PostgreSQL
+                        statement = "SELECT id FROM aktivitetslogg WHERE melding_id = :uuid",
+                        paramMap = mapOf("uuid" to uuid),
+                    ).map { it.long("id") }.asSingle,
                 )!!
 
             val kontekster = finnKontekster(json)

@@ -1,6 +1,6 @@
 package no.nav.dagpenger.aktivitetslogg.api
 
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -42,8 +42,8 @@ class AktivitetsloggApiTest {
         }
 
     @Test
-    fun `repository feiler på duplikater`() {
-        shouldThrow<PSQLException> { aktivitetsloggRepository.lagre(fjerde, "1", getData(fjerde, "1")) }
+    fun `repository feiler ikke på duplikater`() {
+        shouldNotThrow<PSQLException> { aktivitetsloggRepository.lagre(fjerde, "1", getData(fjerde, "1")) }
     }
 
     @Test
