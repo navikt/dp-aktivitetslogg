@@ -4,7 +4,9 @@ import no.nav.dagpenger.aktivitetslogg.Aktivitetslogg
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggMappingPort
 import no.nav.dagpenger.aktivitetslogg.AktivitetsloggVisitor
 
-class AktivitetsloggMap : AktivitetsloggVisitor, AktivitetsloggMappingPort {
+class AktivitetsloggMap :
+    AktivitetsloggVisitor,
+    AktivitetsloggMappingPort {
     private val aktiviteter = mutableListOf<Map<String, Any>>()
     private val alleKontekster = LinkedHashMap<Map<String, Any>, Int>()
 

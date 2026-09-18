@@ -114,25 +114,23 @@ class Aktivitetslogg(
 
     override fun toMap(mapper: AktivitetsloggMappingPort): Map<String, List<Map<String, Any>>> = mapper.map(this)
 
-    fun logg(vararg kontekst: Aktivitetskontekst): Aktivitetslogg {
-        return Aktivitetslogg(this).also {
+    fun logg(vararg kontekst: Aktivitetskontekst): Aktivitetslogg =
+        Aktivitetslogg(this).also {
             it.aktiviteter.addAll(
                 this.aktiviteter.filter { aktivitet ->
                     kontekst.any { it in aktivitet }
                 },
             )
         }
-    }
 
-    internal fun logg(vararg kontekst: String): Aktivitetslogg {
-        return Aktivitetslogg(this).also { aktivitetslogg ->
+    internal fun logg(vararg kontekst: String): Aktivitetslogg =
+        Aktivitetslogg(this).also { aktivitetslogg ->
             aktivitetslogg.aktiviteter.addAll(
                 this.aktiviteter.filter { aktivitet ->
                     kontekst.any { kontekst -> kontekst in aktivitet.kontekster.map { it.kontekstType } }
                 },
             )
         }
-    }
 
     private fun info() = Info.filter(aktiviteter)
 
@@ -161,15 +159,16 @@ class Aktivitetslogg(
         observers.add(observer)
     }
 
-    class AktivitetException internal constructor(private val aktivitetslogg: Aktivitetslogg) :
-        RuntimeException(aktivitetslogg.toString()) {
-            fun kontekst() =
-                aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
-                    result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
-                }
+    class AktivitetException internal constructor(
+        private val aktivitetslogg: Aktivitetslogg,
+    ) : RuntimeException(aktivitetslogg.toString()) {
+        fun kontekst() =
+            aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
+                result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
+            }
 
-            fun aktivitetslogg() = aktivitetslogg
-        }
+        fun aktivitetslogg() = aktivitetslogg
+    }
 
     companion object {
         fun rehydrer(aktiviteter: List<Aktivitet>) = Aktivitetslogg(forelder = null, aktiviteter = aktiviteter.toMutableList())

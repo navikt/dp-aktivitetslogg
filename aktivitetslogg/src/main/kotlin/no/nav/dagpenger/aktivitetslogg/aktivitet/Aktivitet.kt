@@ -29,16 +29,15 @@ sealed class Aktivitet(
             .fold(mapOf()) { result, kontekst -> result + kontekst.kontekstMap }
 
     override fun compareTo(other: Aktivitet) =
-        this.tidsstempel.compareTo(other.tidsstempel)
+        this.tidsstempel
+            .compareTo(other.tidsstempel)
             .let { if (it == 0) other.alvorlighetsgrad.compareTo(this.alvorlighetsgrad) else it }
 
     internal fun inOrder() = label + "\t" + this.toString()
 
     override fun toString() = label + "  \t" + tidsstempel + "  \t" + melding + meldingerString()
 
-    private fun meldingerString(): String {
-        return kontekster.joinToString(separator = "") { " (${it.melding()})" }
-    }
+    private fun meldingerString(): String = kontekster.joinToString(separator = "") { " (${it.melding()})" }
 
     internal abstract fun accept(visitor: AktivitetsloggVisitor)
 

@@ -13,9 +13,7 @@ class Varsel private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 25, 'W', melding, tidsstempel, kontekster) {
     companion object {
-        internal fun filter(aktiviteter: List<Aktivitet>): List<Varsel> {
-            return aktiviteter.filterIsInstance<Varsel>()
-        }
+        internal fun filter(aktiviteter: List<Aktivitet>): List<Varsel> = aktiviteter.filterIsInstance<Varsel>()
 
         internal fun opprett(
             kontekster: List<SpesifikkKontekst>,

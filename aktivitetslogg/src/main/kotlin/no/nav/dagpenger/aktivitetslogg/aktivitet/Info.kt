@@ -12,9 +12,7 @@ class Info private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 0, 'I', melding, tidsstempel, kontekster) {
     companion object {
-        fun filter(aktiviteter: List<Aktivitet>): List<Info> {
-            return aktiviteter.filterIsInstance<Info>()
-        }
+        fun filter(aktiviteter: List<Aktivitet>): List<Info> = aktiviteter.filterIsInstance<Info>()
 
         fun opprett(
             kontekster: List<SpesifikkKontekst>,
