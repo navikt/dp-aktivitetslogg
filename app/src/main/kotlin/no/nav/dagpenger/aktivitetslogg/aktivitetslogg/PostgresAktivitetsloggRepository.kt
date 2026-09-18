@@ -97,6 +97,7 @@ internal class PostgresAktivitetsloggRepository(
                             """
                             INSERT INTO aktivitetslogg (melding_id, ident, json)
                             VALUES (:uuid, :ident, :json::jsonb)
+                            ON CONFLICT (melding_id) DO NOTHING
                             RETURNING id
                             """.trimIndent(),
                         paramMap =
