@@ -13,9 +13,7 @@ class FunksjonellFeil private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 75, 'E', melding, tidsstempel, kontekster) {
     companion object {
-        internal fun filter(aktiviteter: List<Aktivitet>): List<FunksjonellFeil> {
-            return aktiviteter.filterIsInstance<FunksjonellFeil>()
-        }
+        internal fun filter(aktiviteter: List<Aktivitet>): List<FunksjonellFeil> = aktiviteter.filterIsInstance<FunksjonellFeil>()
 
         internal fun opprett(
             kontekster: List<SpesifikkKontekst>,

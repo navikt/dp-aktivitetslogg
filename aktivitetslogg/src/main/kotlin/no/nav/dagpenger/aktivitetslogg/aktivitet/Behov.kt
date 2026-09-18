@@ -14,9 +14,7 @@ class Behov private constructor(
     private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
 ) : Aktivitet(id, 50, 'N', melding, tidsstempel, kontekster) {
     companion object {
-        fun filter(aktiviteter: List<Aktivitet>): List<Behov> {
-            return aktiviteter.filterIsInstance<Behov>()
-        }
+        fun filter(aktiviteter: List<Aktivitet>): List<Behov> = aktiviteter.filterIsInstance<Behov>()
 
         fun opprett(
             type: Behovtype,

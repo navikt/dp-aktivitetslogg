@@ -11,16 +11,16 @@ import no.nav.dagpenger.aktivitetslogg.aktivitet.LogiskFeil
 import no.nav.dagpenger.aktivitetslogg.aktivitet.Varsel
 import java.util.UUID
 
-class AktivitetsloggJsonBuilder(aktivitetslogg: IAktivitetslogg) : AktivitetsloggVisitor {
+class AktivitetsloggJsonBuilder(
+    aktivitetslogg: IAktivitetslogg,
+) : AktivitetsloggVisitor {
     private val aktiviteter = mutableListOf<Map<String, Any>>()
 
     init {
         aktivitetslogg.accept(this)
     }
 
-    fun asList(): List<Map<String, Any>> {
-        return aktiviteter.toList()
-    }
+    fun asList(): List<Map<String, Any>> = aktiviteter.toList()
 
     private enum class Alvorlighetsgrad {
         INFO,
