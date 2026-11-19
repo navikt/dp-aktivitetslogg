@@ -2,12 +2,6 @@ plugins {
     id("common")
     application
 }
-
-repositories {
-    mavenCentral()
-    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
-}
-
 dependencies {
     implementation(project(":openapi"))
     implementation(libs.rapids.and.rivers)
@@ -36,16 +30,4 @@ dependencies {
 
 application {
     mainClass.set("no.nav.dagpenger.aktivitetslogg.AppKt")
-}
-
-repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/navikt/rapids-and-rivers")
-        credentials {
-            val githubUser: String? by project
-            val githubPassword: String? by project
-            username = githubUser
-            password = githubPassword
-        }
-    }
 }
